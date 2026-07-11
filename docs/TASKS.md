@@ -60,6 +60,16 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 - [ ] Arborescence `src/` (moteur) séparée de l'interface.
 - [ ] Cible de simulation par lots pour valider le moteur sans I/O interactive.
 
+## Volet Web — GitHub Pages (transverse, cf. MEMORY D6)
+
+### T8 — Frontend web
+- [x] **T8.1** — Scaffolding : `web/index.html` (vitrine placeholder) + workflow `.github/workflows/pages.yml`.
+- [ ] **T8.2** — *Action manuelle utilisateur* : activer Pages (Settings → Pages → Source = **GitHub Actions**), puis merger sur `main` pour déclencher le 1er déploiement. URL : `https://pretoninho.github.io/jeux-de-plateau-crypto/`.
+- [ ] **T8.3** — Une fois le moteur écrit : cibler une build **WebAssembly** (Emscripten `emcc`) exposant l'API du moteur.
+- [ ] **T8.4** — Pilote JS minimal : charger le WASM, rendre le plateau (hexagones/intersections/arêtes), boucler les tours.
+- [ ] **T8.5** — Brancher l'étape de build WASM dans `pages.yml` (émettre `.wasm`/`.js` dans `web/` avant l'upload).
+- [ ] **T8.6** — Vérifier que le moteur reste **pur/sans I/O** : la couche WASM ne fait qu'exposer des fonctions, aucune règle côté JS.
+
 ## Definition of Done — Phase 1
 
 > Le moteur fait tourner N tours pour P joueurs (2-4), production et construction correctement

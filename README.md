@@ -34,6 +34,18 @@ Glossaire complet et règles détaillées : [`docs/spec.md`](docs/spec.md).
 - État de jeu petit et borné (19 cases, ≤ 4 joueurs) → tableaux à taille fixe, pas d'allocation dynamique dans la boucle de tour.
 - RNG : seed configurable en argument CLI, pour des runs reproductibles.
 
+## Frontend — GitHub Pages
+
+Le site est servi par **GitHub Pages** depuis le dossier [`web/`](web/), déployé via GitHub Actions
+([`.github/workflows/pages.yml`](.github/workflows/pages.yml)).
+
+- URL (après activation) : **https://pretoninho.github.io/jeux-de-plateau-crypto/**
+- Aujourd'hui : page vitrine (règles, distribution, coûts). Le moteur C sera rendu **jouable dans le navigateur**
+  en le compilant en **WebAssembly** (Emscripten) — c'est la séparation moteur / I/O (décision D2) qui rend ce portage possible.
+
+> **Activation (une fois)** : Repo → *Settings* → *Pages* → *Build and deployment* → **Source = GitHub Actions**.
+> Le déploiement se déclenche ensuite à chaque push sur `main` touchant `web/`.
+
 ## Documentation du projet
 
 | Fichier | Rôle |
