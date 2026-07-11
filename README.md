@@ -43,8 +43,8 @@ Le site est servi par **GitHub Pages** depuis le dossier [`web/`](web/), déploy
 - Aujourd'hui : page vitrine (règles, distribution, coûts). Le moteur C sera rendu **jouable dans le navigateur**
   en le compilant en **WebAssembly** (Emscripten) — c'est la séparation moteur / I/O (décision D2) qui rend ce portage possible.
 
-> **Activation (une fois)** : Repo → *Settings* → *Pages* → *Build and deployment* → **Source = GitHub Actions**.
-> Le déploiement se déclenche ensuite à chaque push sur `main` touchant `web/`.
+> Le workflow **active Pages automatiquement** (`configure-pages` avec `enablement: true`) — aucune manip dans les Settings.
+> Le déploiement se déclenche à chaque push sur `main` touchant `web/`.
 
 ## Documentation du projet
 

@@ -38,6 +38,11 @@ jobs:
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        with:
+          # Active GitHub Pages automatiquement si ce n'est pas déjà fait
+          # (évite l'erreur "Get Pages site failed / Not Found" au 1er run,
+          # plus besoin de basculer la source à la main dans Settings → Pages).
+          enablement: true
 
       - name: Upload static site (web/)
         uses: actions/upload-pages-artifact@v3
