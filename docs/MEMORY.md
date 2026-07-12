@@ -4,7 +4,7 @@
 > et à mettre à jour dès qu'une décision est prise, qu'un état change, ou qu'une
 > question ouverte est tranchée. Voir le protocole dans [`../CLAUDE.md`](../CLAUDE.md).
 >
-> **Dernière mise à jour : 2026-07-12 (T3 fait — boucle de tour & production, tests OK)**
+> **Dernière mise à jour : 2026-07-12 (T4 fait — construction & validation, tests OK)**
 
 ---
 
@@ -17,12 +17,11 @@
 
 ## 2. État courant
 
-- **Phase 1 — implémentation en cours.** **T1 (topologie), T2 (génération), T3 (tour & production) terminés.**
-  `src/` : `hex.{h,c}` (coords cube), `types.h`, `board.{h,c}` (topologie + adjacences),
-  `rng.{h,c}` (xorshift32 seedé), `setup.{h,c}` (`board_generate`), `turn.{h,c}` (`roll_2d6`, `game_produce`,
-  `game_turn`), `game.{h,c}` (état + `game_init`). Tests : `test_board.c`, `test_setup.c`, `test_turn.c`. `make test`.
-  Build **zéro warning** (`-Wall -Wextra -Werror -std=c99`). Production validée par recoupement dual
-  (tuile→intersection vs intersection→tuile) + simulation 2000 tours reproductible.
+- **Phase 1 — implémentation en cours.** **T1→T4 terminés** (topologie, génération, tour/production, construction).
+  `src/` : `hex.{h,c}`, `types.h`, `board.{h,c}`, `rng.{h,c}`, `setup.{h,c}`, `turn.{h,c}`,
+  `build.{h,c}` (coûts + validation adjacence + `build_line/position/desk`), `game.{h,c}`.
+  Tests : `test_board.c`, `test_setup.c`, `test_turn.c`, `test_build.c`. `make test`.
+  Build **zéro warning** (`-Wall -Wextra -Werror -std=c99`). Reste T5 (score/fin) et T6/T7 (interface terminal, outillage).
 - Repo contient aussi : `README.md`, `docs/spec.md`, `docs/MEMORY.md`, `docs/TASKS.md`, `CLAUDE.md`, hook SessionStart,
   site vitrine `web/` + workflow de déploiement GitHub Pages (`.github/workflows/pages.yml`), `.gitignore`.
 - **Choix de modélisation T1 (implémente D3)** : représentation 100 % entière, sans flottant — une intersection = clé
@@ -33,8 +32,8 @@
 - **CI Pages** : ✅ résolu. PR #2 mergée, run #3 vert, **site en ligne** (HTTP 200) : https://pretoninho.github.io/jeux-de-plateau-crypto/
 - **Cadrage tranché** : Q1→aléatoire seedé (D7), Q2→Desk inclus (D8), Q3→générique 2–4 (D9). Q4 (nom) reportée.
   Nouveau point ouvert **Q5** : trouver une mécanique « signature » qui distingue le jeu de Catan.
-- Prochaine étape concrète : **T4 — construction & validation** (coûts Ligne/Position/Desk, adjacence : Position sans
-  intersection voisine occupée, Ligne connectée, Desk = upgrade). Q5 se décide plus tard, empiriquement.
+- Prochaine étape concrète : **T5 — valorisation & fin de partie** (points déjà maintenus à la construction ;
+  logger le score par tour, ne pas bloquer sur 10 en Phase 1). Puis T6 (interface terminal) et T7 (outillage/simulation).
 
 ## 3. Décisions figées (structurantes, coûteuses à changer)
 
@@ -107,6 +106,9 @@ Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protèg
 - **Somme = 7** en Phase 1 : Margin Call hors scope → traiter comme un tour sans effet (pas de production, pas de vol).
 - **Condition de victoire** : ne pas bloquer le moteur sur l'atteinte de 10 points en Phase 1 (pas de trading).
   Logger le score à chaque tour ; condition réelle à valider en Phase 2.
+- **Position sans connexion routière (T4)** : la spec Phase 1 n'exige, pour une Position, que la *règle de distance*
+  (aucune intersection voisine occupée) — pas de connexion à une Ligne du joueur. Implémenté ainsi. À rouvrir si l'on
+  veut la règle Catan complète « colonie reliée à une route » (placement libre facilite les tests de la boucle).
 
 ## 7. Données de référence (extraites de la spec — pour rappel rapide)
 
@@ -145,3 +147,9 @@ Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protèg
   production + joueur suivant). `tests/test_turn.c` : 2d6 (forme triangulaire), production recoupée par un calcul
   **dual** intersection→tuile (valide aussi l'inverse des adjacences T1), Desk=2×Position, 7 sans effet,
   reproductibilité sur 2000 tours. Zéro warning. Prochain : T4 (construction & validation).
+- **2026-07-12** — **T4 terminé** : construction & validation. `src/build.{h,c}` — coûts (initialiseurs désignés C99),
+  `can_build_*` (validation pure) / `build_*` (débit + pose + points). Règles : Position = libre + règle de distance ;
+  Ligne = libre + connectée (construction OU route du joueur) ; Desk = upgrade de sa propre Position. Points de
+  victoire maintenus à la construction. `tests/test_build.c` (ids dérivés de la topologie) : distance, coût, occupé,
+  connexion route→route, upgrade, refus Desk sur vide / Position adverse, débits exacts. Zéro warning. Prochain : T5.
+  Point acté (§6) : en Phase 1 la Position n'exige pas de connexion routière (règle de distance seule, cf. spec).

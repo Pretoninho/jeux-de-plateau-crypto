@@ -40,13 +40,13 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 - [x] Comptabilité des ressources par joueur (tableaux à taille fixe dans `Player`).
 - [x] Test (`tests/test_turn.c`) : recoupement dual, Desk=2×, 7 sans effet, simulation 2000 tours reproductible.
 
-### T4 — Construction & validation des règles
-- [ ] Coûts : Ligne (1 SOL+1 ETH), Position (1 SOL+1 ETH+1 Stable+1 Alt), Desk (2 Stable+3 BTC).
-- [ ] Adjacence Position : aucune intersection adjacente déjà occupée (règle de distance).
-- [ ] Adjacence Ligne : connectée à une Ligne ou Position du même joueur.
-- [ ] Desk = upgrade d'une Position existante du joueur (selon décision Q2).
-- [ ] Débit des ressources uniquement si la construction est valide.
-- [ ] Test : constructions valides/invalides couvertes par `assert()`.
+### T4 — Construction & validation des règles ✅
+- [x] Coûts : Ligne (1 SOL+1 ETH), Position (1 SOL+1 ETH+1 Stable+1 Alt), Desk (2 Stable+3 BTC) — `build.c`.
+- [x] Adjacence Position : règle de distance (aucune intersection voisine occupée).
+- [x] Adjacence Ligne : connectée à une Ligne ou Position/Desk du même joueur.
+- [x] Desk = upgrade d'une Position existante du joueur (D8).
+- [x] Débit des ressources uniquement si la construction est valide (`can_build_*` séparé de `build_*`).
+- [x] Test (`tests/test_build.c`) : cas valides/invalides couverts par `assert()`, ids dérivés de la topologie.
 
 ### T5 — Valorisation & fin de partie
 - [ ] Score : Position = 1, Desk = 2. Logger le score à chaque tour.

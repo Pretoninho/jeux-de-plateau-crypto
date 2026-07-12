@@ -2,5 +2,6 @@
 tests/test_board
 tests/test_setup
 tests/test_turn
+tests/test_build
 *.o
 *.out
