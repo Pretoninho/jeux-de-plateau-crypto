@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "printf '=== PROTOCOLE MÉMOIRE (jeux-de-plateau-crypto) ===\\nAvant toute action, consulter la mémoire projet puis la mettre à jour si nécessaire.\\nVoir le protocole dans CLAUDE.md (section Protocole mémoire).\\n\\n----- docs/MEMORY.md -----\\n'; cat docs/MEMORY.md 2>/dev/null || echo '(docs/MEMORY.md introuvable)'; printf '\\n----- docs/TASKS.md (aperçu) -----\\n'; head -n 40 docs/TASKS.md 2>/dev/null || echo '(docs/TASKS.md introuvable)'"
+          }
+        ]
+      }
+    ]
+  }
+}

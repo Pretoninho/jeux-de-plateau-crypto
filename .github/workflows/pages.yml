@@ -1,0 +1,54 @@
+name: Deploy frontend to GitHub Pages
+
+# Déploie le site statique du dossier web/ sur GitHub Pages.
+# ⚠️ Prérequis manuel (une seule fois) :
+#   Repo → Settings → Pages → Build and deployment → Source = "GitHub Actions".
+#
+# NOTE : aujourd'hui ce workflow ne publie que le statique (web/).
+# Quand le moteur C existera, ajouter ici une étape de build WebAssembly
+# (Emscripten : emcc ...) qui émet le .wasm/.js dans web/ avant l'upload.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Une seule exécution de déploiement à la fois ; ne pas annuler un déploiement en cours.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          # Active GitHub Pages automatiquement si ce n'est pas déjà fait
+          # (évite l'erreur "Get Pages site failed / Not Found" au 1er run,
+          # plus besoin de basculer la source à la main dans Settings → Pages).
+          enablement: true
+
+      - name: Upload static site (web/)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
