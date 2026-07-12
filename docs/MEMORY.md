@@ -23,7 +23,7 @@
 - Branche de travail : `claude/file-consultation-4m5duo` (PR #1 mergée ; branche repartie de `main` pour le correctif Pages).
 - **Frontend décidé** : site statique sur **GitHub Pages**, moteur C → **WebAssembly** pour la version jouable (voir D6).
   Aujourd'hui : page vitrine placeholder déployable ; le WASM viendra une fois le moteur écrit.
-- **CI Pages** : run #1 a échoué (Pages pas activé) → correctif `enablement: true` pour que le workflow active Pages seul.
+- **CI Pages** : ✅ résolu. PR #2 mergée, run #3 vert, **site en ligne** (HTTP 200) : https://pretoninho.github.io/jeux-de-plateau-crypto/
 - Prochaine étape concrète : trancher les questions ouvertes §5, puis modéliser le plateau (§ TASKS T1).
 
 ## 3. Décisions figées (structurantes, coûteuses à changer)
@@ -93,3 +93,5 @@
 - **2026-07-11** — Run Pages #1 (post-merge PR #1) en échec : `configure-pages` → « Get Pages site failed / Not Found »
   car Pages n'était pas activé. Correctif : ajout de `enablement: true` à `configure-pages` pour que le workflow
   active Pages automatiquement au prochain run. Plus aucune manip dans Settings. Poussé sur branche repartie de `main`.
+- **2026-07-12** — PR #2 mergée (`aa757bf`). Run Pages #3 **vert** ; site **en ligne** et vérifié (HTTP 200) :
+  https://pretoninho.github.io/jeux-de-plateau-crypto/ . Volet frontend/Pages bouclé. Prochain jalon : trancher Q1–Q4 puis T1.
