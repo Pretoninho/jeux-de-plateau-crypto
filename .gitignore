@@ -3,5 +3,6 @@ tests/test_board
 tests/test_setup
 tests/test_turn
 tests/test_build
+tests/test_score
 *.o
 *.out

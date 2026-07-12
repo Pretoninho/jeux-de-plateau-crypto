@@ -48,9 +48,9 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 - [x] Débit des ressources uniquement si la construction est valide (`can_build_*` séparé de `build_*`).
 - [x] Test (`tests/test_build.c`) : cas valides/invalides couverts par `assert()`, ids dérivés de la topologie.
 
-### T5 — Valorisation & fin de partie
-- [ ] Score : Position = 1, Desk = 2. Logger le score à chaque tour.
-- [ ] Ne pas bloquer sur l'atteinte de 10 en Phase 1 (condition réelle en Phase 2).
+### T5 — Valorisation & fin de partie ✅
+- [x] Score : Position = 1, Desk = 2 — `score.c` (`game_score` recalculé + `game_leader`). Log par tour → côté I/O (T6).
+- [x] Ne pas bloquer sur l'atteinte de 10 en Phase 1 (vérifié par test : score > 10 possible, condition réelle en Phase 2).
 
 ### T6 — Interface terminal (fine, au-dessus du moteur)
 - [ ] Affichage lisible du plateau et de l'état en terminal (aucune logique de règle ici).
