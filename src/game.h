@@ -9,6 +9,7 @@
 #define GAME_H
 
 #include "board.h"
+#include "rng.h"
 
 typedef struct {
     int resources[RES_COUNT];   /* stock par actif */
@@ -21,6 +22,7 @@ typedef struct {
     int    n_players;
     int    current;             /* index du joueur actif */
     unsigned int seed;          /* graine RNG (D5) */
+    Rng    rng;                 /* état du générateur (génération, puis dés) */
 
     /* Occupation du plateau. */
     Building vertex_building[MAX_VERTICES];  /* NONE / POSITION / DESK */

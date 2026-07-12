@@ -1,4 +1,5 @@
 # Binaires de test / build
 tests/test_board
+tests/test_setup
 *.o
 *.out

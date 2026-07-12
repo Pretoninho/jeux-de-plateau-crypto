@@ -27,11 +27,11 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 - [x] Structures C de base : `Tile`, `Vertex`, `Edge` (board.h), `Player`, `GameState` (game.h) — toutes à taille fixe.
 - [x] Tests `assert()` de cohérence topologique (`tests/test_board.c`) : 19/54/72 + invariantes. `make test`, zéro warning.
 
-### T2 — Génération de plateau
-- [ ] Placer les 18 cases ressource + 1 case Rekt selon la distribution (BTC 7 / Alts 4 / ETH 3 / Stable 3 / SOL 1).
-- [ ] Assigner les 18 jetons numériques aléatoirement (RNG seedé, `roll` isolé).
-- [ ] Génération **aléatoire seedée** (D7) : `--seed` → partie reproductible (pas de mode « fixe » séparé).
-- [ ] Test : distribution correcte, jamais de jeton 7, reproductibilité à seed égale.
+### T2 — Génération de plateau ✅
+- [x] 18 cases ressource + 1 Rekt selon la distribution (BTC 7 / Alts 4 / ETH 3 / Stable 3 / SOL 1) — `setup.c`.
+- [x] 18 jetons numériques assignés aléatoirement (Fisher-Yates sur RNG seedé isolé `rng.{h,c}`).
+- [x] Génération **aléatoire seedée** (D7) : `game_init(seed)` → plateau reproductible (pas de mode « fixe »).
+- [x] Test (`tests/test_setup.c`) : distribution, jamais de 7, Rekt=0, reproductibilité à seed égale — 300 graines.
 
 ### T3 — Boucle de tour & production
 - [ ] `roll_2d6()` isolé, seed configurable.
