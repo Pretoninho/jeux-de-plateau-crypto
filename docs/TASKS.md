@@ -33,12 +33,12 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 - [x] Génération **aléatoire seedée** (D7) : `game_init(seed)` → plateau reproductible (pas de mode « fixe »).
 - [x] Test (`tests/test_setup.c`) : distribution, jamais de 7, Rekt=0, reproductibilité à seed égale — 300 graines.
 
-### T3 — Boucle de tour & production
-- [ ] `roll_2d6()` isolé, seed configurable.
-- [ ] Production : pour une somme ≠ 7, chaque case du numéro produit vers Positions (1) / Desks (2) adjacents.
-- [ ] Somme = 7 → tour sans effet (Margin Call hors scope Phase 1).
-- [ ] Comptabilité des ressources par joueur (tableaux à taille fixe).
-- [ ] Test : simulation Monte-Carlo par lots (façon `territoire_sol_risk.c`), moyennes de production cohérentes.
+### T3 — Boucle de tour & production ✅
+- [x] `roll_2d6()` isolé sur `g->rng` (`turn.c`).
+- [x] Production : somme ≠ 7 → chaque tuile du numéro verse aux Positions (1) / Desks (2) adjacents (`game_produce`).
+- [x] Somme = 7 → tour sans effet (Margin Call hors scope Phase 1).
+- [x] Comptabilité des ressources par joueur (tableaux à taille fixe dans `Player`).
+- [x] Test (`tests/test_turn.c`) : recoupement dual, Desk=2×, 7 sans effet, simulation 2000 tours reproductible.
 
 ### T4 — Construction & validation des règles
 - [ ] Coûts : Ligne (1 SOL+1 ETH), Position (1 SOL+1 ETH+1 Stable+1 Alt), Desk (2 Stable+3 BTC).

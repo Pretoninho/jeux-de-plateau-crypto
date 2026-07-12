@@ -4,7 +4,7 @@
 > et à mettre à jour dès qu'une décision est prise, qu'un état change, ou qu'une
 > question ouverte est tranchée. Voir le protocole dans [`../CLAUDE.md`](../CLAUDE.md).
 >
-> **Dernière mise à jour : 2026-07-12 (T2 fait — génération plateau + RNG seedé, tests OK)**
+> **Dernière mise à jour : 2026-07-12 (T3 fait — boucle de tour & production, tests OK)**
 
 ---
 
@@ -17,12 +17,12 @@
 
 ## 2. État courant
 
-- **Phase 1 — implémentation en cours.** **T1 (topologie) et T2 (génération) terminés.**
+- **Phase 1 — implémentation en cours.** **T1 (topologie), T2 (génération), T3 (tour & production) terminés.**
   `src/` : `hex.{h,c}` (coords cube), `types.h`, `board.{h,c}` (topologie + adjacences),
-  `rng.{h,c}` (xorshift32 seedé), `setup.{h,c}` (`board_generate` : ressources + jetons),
-  `game.{h,c}` (état + `game_init` = build + generate). Tests : `tests/test_board.c`, `tests/test_setup.c`. `make test`.
-  Build **zéro warning** (`-Wall -Wextra -Werror -std=c99`). 19/54/72 vérifiés ; distribution + jetons + reproductibilité
-  validés sur 300 graines.
+  `rng.{h,c}` (xorshift32 seedé), `setup.{h,c}` (`board_generate`), `turn.{h,c}` (`roll_2d6`, `game_produce`,
+  `game_turn`), `game.{h,c}` (état + `game_init`). Tests : `test_board.c`, `test_setup.c`, `test_turn.c`. `make test`.
+  Build **zéro warning** (`-Wall -Wextra -Werror -std=c99`). Production validée par recoupement dual
+  (tuile→intersection vs intersection→tuile) + simulation 2000 tours reproductible.
 - Repo contient aussi : `README.md`, `docs/spec.md`, `docs/MEMORY.md`, `docs/TASKS.md`, `CLAUDE.md`, hook SessionStart,
   site vitrine `web/` + workflow de déploiement GitHub Pages (`.github/workflows/pages.yml`), `.gitignore`.
 - **Choix de modélisation T1 (implémente D3)** : représentation 100 % entière, sans flottant — une intersection = clé
@@ -33,8 +33,8 @@
 - **CI Pages** : ✅ résolu. PR #2 mergée, run #3 vert, **site en ligne** (HTTP 200) : https://pretoninho.github.io/jeux-de-plateau-crypto/
 - **Cadrage tranché** : Q1→aléatoire seedé (D7), Q2→Desk inclus (D8), Q3→générique 2–4 (D9). Q4 (nom) reportée.
   Nouveau point ouvert **Q5** : trouver une mécanique « signature » qui distingue le jeu de Catan.
-- Prochaine étape concrète : **T3 — boucle de tour & production** (`roll_2d6()` isolé sur `g->rng`, production vers
-  Positions/Desks adjacents, 7 = tour sans effet). Q5 se décide plus tard, empiriquement (ne pas sur-concevoir avant).
+- Prochaine étape concrète : **T4 — construction & validation** (coûts Ligne/Position/Desk, adjacence : Position sans
+  intersection voisine occupée, Ligne connectée, Desk = upgrade). Q5 se décide plus tard, empiriquement.
 
 ## 3. Décisions figées (structurantes, coûteuses à changer)
 
@@ -140,3 +140,8 @@ Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protèg
   Fisher-Yates). `game_init` enchaîne build+generate sur le même flux RNG. `tests/test_setup.c` valide distribution,
   jetons (jamais de 7, Rekt=0), reproductibilité à graine égale, effet de la graine — sur 300 graines. Zéro warning.
   Choix RNG : xorshift explicite plutôt que `rand()` global (précision de la décision déférée sur l'algo). Prochain : T3.
+- **2026-07-12** — **T3 terminé** : boucle de tour & production. `src/turn.{h,c}` — `roll_2d6()` isolé sur `g->rng`,
+  `game_produce()` (tuile du numéro → +1 par Position / +2 par Desk adjacent ; 7 = no-op), `game_turn()` (lancer +
+  production + joueur suivant). `tests/test_turn.c` : 2d6 (forme triangulaire), production recoupée par un calcul
+  **dual** intersection→tuile (valide aussi l'inverse des adjacences T1), Desk=2×Position, 7 sans effet,
+  reproductibilité sur 2000 tours. Zéro warning. Prochain : T4 (construction & validation).

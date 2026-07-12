@@ -1,5 +1,6 @@
 # Binaires de test / build
 tests/test_board
 tests/test_setup
+tests/test_turn
 *.o
 *.out

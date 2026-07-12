@@ -4,9 +4,9 @@
 
 CC      = gcc
 CFLAGS  = -Wall -Wextra -std=c99 -O2
-ENGINE  = src/hex.c src/board.c src/rng.c src/setup.c src/game.c
+ENGINE  = src/hex.c src/board.c src/rng.c src/setup.c src/turn.c src/game.c
 HEADERS = $(wildcard src/*.h)
-TESTS   = tests/test_board tests/test_setup
+TESTS   = tests/test_board tests/test_setup tests/test_turn
 
 .PHONY: all test clean
 
@@ -16,12 +16,16 @@ all: test
 test: $(TESTS)
 	./tests/test_board
 	./tests/test_setup
+	./tests/test_turn
 
 tests/test_board: tests/test_board.c $(ENGINE) $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ tests/test_board.c $(ENGINE)
 
 tests/test_setup: tests/test_setup.c $(ENGINE) $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ tests/test_setup.c $(ENGINE)
+
+tests/test_turn: tests/test_turn.c $(ENGINE) $(HEADERS)
+	$(CC) $(CFLAGS) -o $@ tests/test_turn.c $(ENGINE)
 
 clean:
 	rm -f $(TESTS)
