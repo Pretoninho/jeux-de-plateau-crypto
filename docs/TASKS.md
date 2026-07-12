@@ -64,7 +64,7 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 
 ### T8 — Frontend web
 - [x] **T8.1** — Scaffolding : `web/index.html` (vitrine placeholder) + workflow `.github/workflows/pages.yml`.
-- [ ] **T8.2** — *Action manuelle utilisateur* : activer Pages (Settings → Pages → Source = **GitHub Actions**), puis merger sur `main` pour déclencher le 1er déploiement. URL : `https://pretoninho.github.io/jeux-de-plateau-crypto/`.
+- [x] **T8.2** — Auto-activation de Pages par le workflow (`configure-pages` avec `enablement: true`) : plus d'action manuelle dans Settings. Le déploiement se fait au merge sur `main`. URL : `https://pretoninho.github.io/jeux-de-plateau-crypto/`.
 - [ ] **T8.3** — Une fois le moteur écrit : cibler une build **WebAssembly** (Emscripten `emcc`) exposant l'API du moteur.
 - [ ] **T8.4** — Pilote JS minimal : charger le WASM, rendre le plateau (hexagones/intersections/arêtes), boucler les tours.
 - [ ] **T8.5** — Brancher l'étape de build WASM dans `pages.yml` (émettre `.wasm`/`.js` dans `web/` avant l'upload).
