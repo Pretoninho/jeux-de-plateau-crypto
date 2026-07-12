@@ -4,7 +4,7 @@
 > et à mettre à jour dès qu'une décision est prise, qu'un état change, ou qu'une
 > question ouverte est tranchée. Voir le protocole dans [`../CLAUDE.md`](../CLAUDE.md).
 >
-> **Dernière mise à jour : 2026-07-11 (D6 — Pages auto-activé via `enablement: true`)**
+> **Dernière mise à jour : 2026-07-12 (Q1–Q3 tranchées ; Q5 « divergence Catan » ouverte)**
 
 ---
 
@@ -24,7 +24,10 @@
 - **Frontend décidé** : site statique sur **GitHub Pages**, moteur C → **WebAssembly** pour la version jouable (voir D6).
   Aujourd'hui : page vitrine placeholder déployable ; le WASM viendra une fois le moteur écrit.
 - **CI Pages** : ✅ résolu. PR #2 mergée, run #3 vert, **site en ligne** (HTTP 200) : https://pretoninho.github.io/jeux-de-plateau-crypto/
-- Prochaine étape concrète : trancher les questions ouvertes §5, puis modéliser le plateau (§ TASKS T1).
+- **Cadrage tranché** : Q1→aléatoire seedé (D7), Q2→Desk inclus (D8), Q3→générique 2–4 (D9). Q4 (nom) reportée.
+  Nouveau point ouvert **Q5** : trouver une mécanique « signature » qui distingue le jeu de Catan.
+- Prochaine étape concrète : **T1 — modélisation du plateau** (hex + intersections + arêtes). Q5 se décide plus tard,
+  empiriquement, une fois la boucle de base qui tourne (ne pas sur-concevoir avant).
 
 ## 3. Décisions figées (structurantes, coûteuses à changer)
 
@@ -36,6 +39,9 @@
 | D4 | État borné → **tableaux à taille fixe**, pas d'allocation dynamique dans la boucle de tour | 19 cases, ≤ 4 joueurs. |
 | D5 | RNG : **seed configurable en argument CLI** (runs reproductibles) | `rand()` pour commencer, isolé dans `roll_2d6()`. |
 | D6 | **Frontend web sur GitHub Pages** ; moteur C compilé en **WebAssembly (Emscripten)** pour la version jouable | Rend D2 encore plus critique : le moteur DOIT rester pur/sans I/O pour être embarquable en WASM. Interface terminal et interface web partagent le même moteur. |
+| D7 | **Génération de plateau aléatoire seedée** dès le départ (pas de mode « layout fixe » séparé) | `--seed` rend chaque partie reproductible → tests déterministes ET spec respectée. Tranche Q1. |
+| D8 | **Desk (ville) inclus dès la Phase 1** | Déjà dans le périmètre spec (coût 2 Stables + 3 BTC), upgrade d'une Position. Boucle de jeu complète. Tranche Q2. |
+| D9 | **Moteur générique 2–4 joueurs** dès le début (tableaux dimensionnés à 4) ; valider d'abord à 2, puis l'adjacence à 3–4 | Évite un refactor ultérieur. Tranche Q3. |
 
 ### Détail D6 — Frontend GitHub Pages
 
@@ -62,10 +68,29 @@
 
 | # | Question | Statut |
 |---|---|---|
-| Q1 | Layout de plateau fixe pour les premiers tests, ou générateur aléatoire dès le départ ? | ⬜ ouvert |
-| Q2 | Desk (ville) inclus en Phase 1, ou repoussé en Phase 2 avec Signal/trading ? | ⬜ ouvert |
-| Q3 | Nombre de joueurs cible pour la 1re version jouable (2 pour la boucle ; 3-4 pour l'adjacence) ? | ⬜ ouvert |
-| Q4 | Nom de projet définitif (sans nom pour l'instant) ? | ⬜ ouvert |
+| Q1 | Layout de plateau fixe ou générateur aléatoire ? | ✅ tranchée → **aléatoire seedé** (D7) |
+| Q2 | Desk inclus en Phase 1 ? | ✅ tranchée → **oui, inclus** (D8) |
+| Q3 | Nombre de joueurs cible pour la 1re version ? | ✅ tranchée → **générique 2–4, test à 2** (D9) |
+| Q4 | Nom de projet définitif ? | ⏸️ **reportée** — identifiants C neutres en attendant ; à trancher plus tard |
+| Q5 | **Divergence vs Catan** : quel(s) mécanisme(s)/expression propre(s) pour que le jeu ne soit pas un calque trait pour trait de Catan ? | ⬜ **ouvert** — à mûrir (pistes ci-dessous) |
+
+### Pistes pour Q5 — divergence vs Catan (brainstorm, RIEN de tranché)
+
+But : une identité mécanique propre, pas juste un reskin cosmétique. Idées à évaluer (empiriquement, une fois le
+moteur de base tournant — ne pas sur-concevoir avant) :
+
+- **Volatilité des jetons** : les numéros/valeurs de production fluctuent au fil des tours (cycles de marché),
+  là où Catan fige les numéros à la mise en place. Mécanique 100 % crypto, absente de Catan.
+- **Halving** : événement périodique qui divise (ou modifie) la production de BTC — rareté programmée dans le temps.
+- **Staking / rendement** : bloquer des ressources pour un revenu passif, au lieu de tout dépenser en construction.
+- **Gas fees** : un petit coût variable à la construction (tension supplémentaire selon la « congestion »).
+- **Margin Call enrichi** : au lieu du simple voleur, une liquidation qui dépend de l'exposition du joueur
+  (plus tu es « leveraged », plus tu risques gros au 7).
+- **Airdrops** : gains aléatoires ponctuels récompensant une position ou un comportement.
+
+⚠️ Contrainte de cohérence : toute divergence doit **respecter D2** (logique dans le moteur pur, pas d'I/O) et rester
+bornée (pas d'alloc dynamique dans la boucle). Choisir **1 mécanique signature** d'abord plutôt que tout empiler.
+Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protège si le projet devient public un jour.
 
 ## 6. Points connus & acceptés (ne pas rouvrir sans raison)
 
@@ -95,3 +120,6 @@
   active Pages automatiquement au prochain run. Plus aucune manip dans Settings. Poussé sur branche repartie de `main`.
 - **2026-07-12** — PR #2 mergée (`aa757bf`). Run Pages #3 **vert** ; site **en ligne** et vérifié (HTTP 200) :
   https://pretoninho.github.io/jeux-de-plateau-crypto/ . Volet frontend/Pages bouclé. Prochain jalon : trancher Q1–Q4 puis T1.
+- **2026-07-12** — Cadrage Phase 0 tranché : **D7** (plateau aléatoire seedé), **D8** (Desk inclus Phase 1),
+  **D9** (moteur générique 2–4, test à 2). Q4 (nom) reportée. Ouverture de **Q5** : divergence mécanique vs Catan
+  (le jeu ne doit pas être un calque trait pour trait) — pistes listées en §5, décision empirique différée après T1.

@@ -9,12 +9,14 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 
 ## Phase 0 — Cadrage (préalable au code)
 
-- [ ] **T0.1** — Trancher les questions ouvertes (MEMORY §5) :
-  - [ ] Q1 : layout fixe pour tests, ou générateur aléatoire d'emblée ?
-  - [ ] Q2 : Desk inclus en Phase 1, ou repoussé ?
-  - [ ] Q3 : nombre de joueurs pour la 1re version jouable ?
-  - [ ] Q4 : nom de projet définitif ?
+- [x] **T0.1** — Trancher les questions ouvertes (MEMORY §5) :
+  - [x] Q1 : **aléatoire seedé** (D7).
+  - [x] Q2 : **Desk inclus** en Phase 1 (D8).
+  - [x] Q3 : **générique 2–4**, tester à 2 (D9).
+  - [ ] Q4 : nom de projet — **reporté** (identifiants C neutres en attendant).
 - [x] **T0.2** — Ancrer la spec, la mémoire et le protocole de session dans le repo.
+- [ ] **T0.3** — **Q5 — mécanique « signature » qui distingue le jeu de Catan** (MEMORY §5, pistes listées).
+  Décision empirique, **après** que la boucle de base tourne (T1–T5). Ne pas sur-concevoir avant.
 
 ## Phase 1 — Moteur de règles (cœur, sans I/O)
 
@@ -28,7 +30,7 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 ### T2 — Génération de plateau
 - [ ] Placer les 18 cases ressource + 1 case Rekt selon la distribution (BTC 7 / Alts 4 / ETH 3 / Stable 3 / SOL 1).
 - [ ] Assigner les 18 jetons numériques aléatoirement (RNG seedé, `roll` isolé).
-- [ ] Mode layout fixe **et/ou** aléatoire selon décision Q1.
+- [ ] Génération **aléatoire seedée** (D7) : `--seed` → partie reproductible (pas de mode « fixe » séparé).
 - [ ] Test : distribution correcte, jamais de jeton 7, reproductibilité à seed égale.
 
 ### T3 — Boucle de tour & production
