@@ -4,7 +4,7 @@
 > et à mettre à jour dès qu'une décision est prise, qu'un état change, ou qu'une
 > question ouverte est tranchée. Voir le protocole dans [`../CLAUDE.md`](../CLAUDE.md).
 >
-> **Dernière mise à jour : 2026-07-12 (Q1–Q3 tranchées ; Q5 « divergence Catan » ouverte)**
+> **Dernière mise à jour : 2026-07-12 (T1 fait — topologie du plateau en C, tests OK)**
 
 ---
 
@@ -17,17 +17,22 @@
 
 ## 2. État courant
 
-- **Phase 1 — préparation.** Aucun code C écrit à ce jour.
-- Repo contient : `README.md`, `docs/spec.md`, `docs/MEMORY.md`, `docs/TASKS.md`, `CLAUDE.md`, hook SessionStart,
-  site vitrine `web/` + workflow de déploiement GitHub Pages (`.github/workflows/pages.yml`).
+- **Phase 1 — implémentation démarrée.** Premier code C écrit : **T1 (topologie du plateau) terminé**.
+  `src/` : `hex.{h,c}` (coords cube), `types.h`, `board.{h,c}` (tuiles/intersections/arêtes + adjacences),
+  `game.{h,c}` (squelette état). Tests : `tests/test_board.c` (asserts topologiques). `Makefile` (`make test`).
+  Build **zéro warning** (`-Wall -Wextra -Werror -std=c99`), 19 tuiles / 54 intersections / 72 arêtes vérifiées.
+- Repo contient aussi : `README.md`, `docs/spec.md`, `docs/MEMORY.md`, `docs/TASKS.md`, `CLAUDE.md`, hook SessionStart,
+  site vitrine `web/` + workflow de déploiement GitHub Pages (`.github/workflows/pages.yml`), `.gitignore`.
+- **Choix de modélisation T1 (implémente D3)** : représentation 100 % entière, sans flottant — une intersection = clé
+  canonique des 3 hexes qui s'y rencontrent, une arête = les 2 hexes partagés. Déduplication et adjacence exactes.
 - Branche de travail : `claude/file-consultation-4m5duo` (PR #1 mergée ; branche repartie de `main` pour le correctif Pages).
 - **Frontend décidé** : site statique sur **GitHub Pages**, moteur C → **WebAssembly** pour la version jouable (voir D6).
   Aujourd'hui : page vitrine placeholder déployable ; le WASM viendra une fois le moteur écrit.
 - **CI Pages** : ✅ résolu. PR #2 mergée, run #3 vert, **site en ligne** (HTTP 200) : https://pretoninho.github.io/jeux-de-plateau-crypto/
 - **Cadrage tranché** : Q1→aléatoire seedé (D7), Q2→Desk inclus (D8), Q3→générique 2–4 (D9). Q4 (nom) reportée.
   Nouveau point ouvert **Q5** : trouver une mécanique « signature » qui distingue le jeu de Catan.
-- Prochaine étape concrète : **T1 — modélisation du plateau** (hex + intersections + arêtes). Q5 se décide plus tard,
-  empiriquement, une fois la boucle de base qui tourne (ne pas sur-concevoir avant).
+- Prochaine étape concrète : **T2 — génération de plateau** (assigner ressources selon la distribution + jetons
+  numériques via RNG seedé, `roll` isolé). Q5 se décide plus tard, empiriquement (ne pas sur-concevoir avant).
 
 ## 3. Décisions figées (structurantes, coûteuses à changer)
 
@@ -123,3 +128,7 @@ Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protèg
 - **2026-07-12** — Cadrage Phase 0 tranché : **D7** (plateau aléatoire seedé), **D8** (Desk inclus Phase 1),
   **D9** (moteur générique 2–4, test à 2). Q4 (nom) reportée. Ouverture de **Q5** : divergence mécanique vs Catan
   (le jeu ne doit pas être un calque trait pour trait) — pistes listées en §5, décision empirique différée après T1.
+- **2026-07-12** — **T1 terminé** : premier code C. Topologie du plateau en coords cube (`src/hex,board,game` + types),
+  clé canonique entière (intersection = 3 hexes, arête = 2 hexes) → dédup/adjacence exactes. `tests/test_board.c`
+  valide 19/54/72 et toutes les invariantes (symétrie voisinage, sommes 84/114/114, cohérence arête↔intersection).
+  Build zéro warning sous `-Wall -Wextra -Werror -std=c99`. Makefile (`make test`) + `.gitignore`. Prochain : T2.

@@ -20,12 +20,12 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 
 ## Phase 1 — Moteur de règles (cœur, sans I/O)
 
-### T1 — Modélisation du plateau *(le point dur — à faire en premier)*
-- [ ] Choisir la représentation : coordonnées axiales/cube pour les hexagones.
-- [ ] Représenter les **intersections** (sommets — emplacements de Positions/Desks) et les **arêtes** (Lignes).
-- [ ] Table d'adjacence hex ↔ intersection ↔ arête (précalculée, taille fixe).
-- [ ] Structures C de base : `Tile`, `Vertex`, `Edge`, `Player`, `GameState` (tous à taille fixe).
-- [ ] Tests `assert()` sur la cohérence topologique (nb d'intersections, d'arêtes, adjacences).
+### T1 — Modélisation du plateau ✅ *(le point dur — fait)*
+- [x] Représentation : coordonnées **cube** (`src/hex.{h,c}`).
+- [x] **Intersections** (clé = 3 hexes) et **arêtes** (clé = 2 hexes) — `src/board.{h,c}`, 100 % entier.
+- [x] Tables d'adjacence hex ↔ intersection ↔ arête (précalculées, taille fixe).
+- [x] Structures C de base : `Tile`, `Vertex`, `Edge` (board.h), `Player`, `GameState` (game.h) — toutes à taille fixe.
+- [x] Tests `assert()` de cohérence topologique (`tests/test_board.c`) : 19/54/72 + invariantes. `make test`, zéro warning.
 
 ### T2 — Génération de plateau
 - [ ] Placer les 18 cases ressource + 1 case Rekt selon la distribution (BTC 7 / Alts 4 / ETH 3 / Stable 3 / SOL 1).

@@ -1,0 +1,4 @@
+# Binaires de test / build
+tests/test_board
+*.o
+*.out
