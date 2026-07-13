@@ -28,7 +28,8 @@
   → `web/engine.js`/`.wasm`, artefacts non versionnés) et piloté par une UI web (`web/play.html` + `web/game.js`,
   plateau hexagonal SVG cliquable, hotseat 2–4). Le workflow Pages installe Emscripten et build le WASM avant déploiement.
   Validé end-to-end (Playwright/Chromium) : 19 hexagones, 72 arêtes, lancer + production OK, zéro erreur console.
-  Suite : Phase 2 (trading, Signal, Margin Call…) et/ou Q5 (identité mécanique).
+  **EN LIGNE** : https://pretoninho.github.io/jeux-de-plateau-crypto/play.html (run Pages #5 vert, WASM buildé en CI ;
+  assets 200 + `application/wasm` vérifiés par curl). Suite : Phase 2 (trading, Signal, Margin Call…) et/ou Q5.
 - Repo contient aussi : `README.md`, `docs/spec.md`, `docs/MEMORY.md`, `docs/TASKS.md`, `CLAUDE.md`, hook SessionStart,
   site vitrine `web/` + workflow de déploiement GitHub Pages (`.github/workflows/pages.yml`), `.gitignore`.
 - **Choix de modélisation T1 (implémente D3)** : représentation 100 % entière, sans flottant — une intersection = clé
