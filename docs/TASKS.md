@@ -69,10 +69,10 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 ### T8 — Frontend web
 - [x] **T8.1** — Scaffolding : `web/index.html` (vitrine placeholder) + workflow `.github/workflows/pages.yml`.
 - [x] **T8.2** — Auto-activation de Pages par le workflow (`configure-pages` avec `enablement: true`) : plus d'action manuelle dans Settings. Le déploiement se fait au merge sur `main`. URL : `https://pretoninho.github.io/jeux-de-plateau-crypto/`.
-- [ ] **T8.3** — Une fois le moteur écrit : cibler une build **WebAssembly** (Emscripten `emcc`) exposant l'API du moteur.
-- [ ] **T8.4** — Pilote JS minimal : charger le WASM, rendre le plateau (hexagones/intersections/arêtes), boucler les tours.
-- [ ] **T8.5** — Brancher l'étape de build WASM dans `pages.yml` (émettre `.wasm`/`.js` dans `web/` avant l'upload).
-- [ ] **T8.6** — Vérifier que le moteur reste **pur/sans I/O** : la couche WASM ne fait qu'exposer des fonctions, aucune règle côté JS.
+- [x] **T8.3** — Build **WebAssembly** (Emscripten `emcc`, `make wasm`) exposant l'API du moteur (`src/wasm_api.c`).
+- [x] **T8.4** — Pilote JS (`web/game.js`) : charge le WASM, rend le plateau SVG (hexagones/intersections/arêtes), boucle hotseat 2–4 (`web/play.html`).
+- [x] **T8.5** — Étape de build WASM branchée dans `pages.yml` (installe emsdk, `make wasm`, émet `.js`/`.wasm` dans `web/`).
+- [x] **T8.6** — Moteur pur préservé : la couche WASM ne fait qu'exposer des fonctions, **aucune règle en JS** (D2). Validé E2E (Playwright).
 
 ## Definition of Done — Phase 1 ✅ ATTEINTE
 

@@ -4,7 +4,7 @@
 > et à mettre à jour dès qu'une décision est prise, qu'un état change, ou qu'une
 > question ouverte est tranchée. Voir le protocole dans [`../CLAUDE.md`](../CLAUDE.md).
 >
-> **Dernière mise à jour : 2026-07-12 (T7 fait — simulation par lots ; PHASE 1 COMPLÈTE)**
+> **Dernière mise à jour : 2026-07-13 (T8 — jeu jouable dans le navigateur via WebAssembly)**
 
 ---
 
@@ -23,7 +23,12 @@
   Outillage : `sim.{h,c}` (`sim_run`/`sim_report`). Binaire `crypto-board`.
   Tests : `test_board/setup/turn/build/score/ui/sim.c` (7 suites, `make test`). CLI : `--seed`, `--players`, `--demo`,
   `--sim`, `--turns`. `make run` (démo), `make sim` (1000 parties). Build **zéro warning** (`-Wall -Wextra -Werror -std=c99`).
-  **Definition of Done Phase 1 atteinte.** Suite : Phase 2 (trading, Signal, Margin Call…) et/ou Q5 (identité mécanique).
+  **Definition of Done Phase 1 atteinte.**
+- **Jeu jouable dans le navigateur (T8, WASM).** Le moteur pur est compilé en WebAssembly (`src/wasm_api.c` + `make wasm`
+  → `web/engine.js`/`.wasm`, artefacts non versionnés) et piloté par une UI web (`web/play.html` + `web/game.js`,
+  plateau hexagonal SVG cliquable, hotseat 2–4). Le workflow Pages installe Emscripten et build le WASM avant déploiement.
+  Validé end-to-end (Playwright/Chromium) : 19 hexagones, 72 arêtes, lancer + production OK, zéro erreur console.
+  Suite : Phase 2 (trading, Signal, Margin Call…) et/ou Q5 (identité mécanique).
 - Repo contient aussi : `README.md`, `docs/spec.md`, `docs/MEMORY.md`, `docs/TASKS.md`, `CLAUDE.md`, hook SessionStart,
   site vitrine `web/` + workflow de déploiement GitHub Pages (`.github/workflows/pages.yml`), `.gitignore`.
 - **Choix de modélisation T1 (implémente D3)** : représentation 100 % entière, sans flottant — une intersection = clé
@@ -59,8 +64,9 @@
 - **URL attendue** : `https://pretoninho.github.io/jeux-de-plateau-crypto/`.
 - **Source du site** : dossier `web/` (statique, self-contained, aucune dépendance externe — cohérent avec l'éthos zéro-dépendance).
 - **Aujourd'hui** : `web/index.html` = page vitrine placeholder (règles, distribution, coûts, statut « moteur à venir »).
-- **Cible jouable** : compiler le moteur C en WASM via Emscripten (`emcc`), pilote JS minimal au-dessus.
-  Le build WASM sera ajouté au workflow *une fois le moteur écrit* (aujourd'hui le workflow ne déploie que le statique).
+- **Cible jouable : FAITE (T8).** Moteur compilé en WASM via Emscripten (`src/wasm_api.c`, `make wasm`), UI web SVG
+  (`web/play.html`+`web/game.js`). Le workflow Pages installe emsdk et build le WASM à chaque déploiement.
+  Dev local : `source ~/emsdk/emsdk_env.sh && make wasm`, puis servir `web/` (`python3 -m http.server`).
 - Le terminal (spec Phase 1) reste la 1re interface de validation ; le web est une **seconde interface** sur le même moteur,
   pas un remplacement. N'introduit aucune I/O dans le moteur.
 
@@ -181,3 +187,9 @@ Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protèg
   `--sim`/`--turns` ; `make sim`. `tests/test_sim.c` : invariantes (Rekt=0, BTC quasi toujours produit, SOL plus rare
   que BTC), reproductibilité, effet de graine. Constat empirique consigné en §6 (SOL ~26 % sous notre modèle).
   **DoD Phase 1 atteinte.** 7 suites de test, zéro warning. Suite : Phase 2 et/ou Q5.
+- **2026-07-13** — **T8 : jeu jouable dans le navigateur (WebAssembly).** `src/wasm_api.c` expose le moteur pur au JS
+  (géométrie du plateau, actions, scores) ; `make wasm` (emcc) → `web/engine.js`/`.wasm` (gitignore). UI `web/play.html`
+  + `web/game.js` : plateau hexagonal SVG cliquable, dés, ressources, scores, hotseat 2–4 ; bouton « Jouer » sur la
+  vitrine. Workflow Pages : installe Emscripten et build le WASM avant l'upload (paths élargis à `src/`+`Makefile`).
+  Validé E2E avec Playwright/Chromium (serveur local) : 19 hexagones, 72 arêtes, 6 positions initiales, lancer 2d6 +
+  production, aucune erreur console. Aucune règle en JS : tout passe par l'API WASM (D2 tient jusque dans le navigateur).

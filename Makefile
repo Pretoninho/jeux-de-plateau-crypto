@@ -13,9 +13,18 @@ BIN     = crypto-board
 TESTS   = tests/test_board tests/test_setup tests/test_turn tests/test_build \
           tests/test_score tests/test_ui tests/test_sim
 
-.PHONY: all test run sim clean
+.PHONY: all test run sim wasm clean
 
 all: test $(BIN)
+
+# Build WebAssembly du moteur pour le frontend web (nécessite emcc dans le PATH).
+# Émet web/engine.js + web/engine.wasm (artefacts, non versionnés).
+WASM_FLAGS = -O2 -sMODULARIZE=1 -sEXPORT_NAME=createEngine \
+             -sEXPORTED_RUNTIME_METHODS=ccall,cwrap \
+             -sENVIRONMENT=web -sALLOW_MEMORY_GROWTH=1
+wasm: web/engine.js
+web/engine.js: $(ENGINE) src/wasm_api.c $(HEADERS)
+	emcc $(ENGINE) src/wasm_api.c $(WASM_FLAGS) -o web/engine.js
 
 # Compile et exécute tous les tests.
 test: $(TESTS)

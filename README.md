@@ -37,17 +37,28 @@ Glossaire complet et règles détaillées : [`docs/spec.md`](docs/spec.md).
 - État de jeu petit et borné (19 cases, ≤ 4 joueurs) → tableaux à taille fixe, pas d'allocation dynamique dans la boucle de tour.
 - RNG : seed configurable en argument CLI, pour des runs reproductibles.
 
-## Frontend — GitHub Pages
+## Frontend — jouable dans le navigateur
 
 Le site est servi par **GitHub Pages** depuis le dossier [`web/`](web/), déployé via GitHub Actions
 ([`.github/workflows/pages.yml`](.github/workflows/pages.yml)).
 
-- URL (après activation) : **https://pretoninho.github.io/jeux-de-plateau-crypto/**
-- Aujourd'hui : page vitrine (règles, distribution, coûts). Le moteur C sera rendu **jouable dans le navigateur**
-  en le compilant en **WebAssembly** (Emscripten) — c'est la séparation moteur / I/O (décision D2) qui rend ce portage possible.
+- **Jouer** : **https://pretoninho.github.io/jeux-de-plateau-crypto/play.html** (accueil : `.../` )
+- Le **moteur C tourne dans le navigateur**, compilé en **WebAssembly** (Emscripten). Le JS ne contient aucune
+  règle — il pilote le moteur via l'API `wasm_*` ([`src/wasm_api.c`](src/wasm_api.c)). C'est la séparation
+  moteur / I/O (décision D2) qui rend ce portage possible.
+- Plateau hexagonal SVG cliquable, dés, ressources, scores, hotseat 2–4 ([`web/play.html`](web/play.html), [`web/game.js`](web/game.js)).
 
-> Le workflow **active Pages automatiquement** (`configure-pages` avec `enablement: true`) — aucune manip dans les Settings.
-> Le déploiement se déclenche à chaque push sur `main` touchant `web/`.
+Le workflow installe Emscripten, exécute `make wasm`, puis déploie `web/` (les artefacts `engine.js`/`engine.wasm`
+ne sont pas versionnés). Pages est activé automatiquement (`enablement: true`).
+
+### Build WASM en local
+
+```sh
+# une fois : installer Emscripten (emsdk), puis dans chaque shell :
+source ~/emsdk/emsdk_env.sh
+make wasm                     # -> web/engine.js + web/engine.wasm
+python3 -m http.server -d web 8099   # puis ouvrir http://localhost:8099/play.html
+```
 
 ## Documentation du projet
 

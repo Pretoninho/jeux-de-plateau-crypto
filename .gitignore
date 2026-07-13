@@ -9,3 +9,7 @@ tests/test_sim
 crypto-board
 *.o
 *.out
+
+# Artefacts WebAssembly (générés par emcc / la CI)
+web/engine.js
+web/engine.wasm
