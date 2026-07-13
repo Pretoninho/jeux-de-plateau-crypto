@@ -6,7 +6,9 @@ Reskin crypto d'un jeu à mécaniques **Catan** (hexagones, dés, production, co
 
 ## État actuel
 
-**Phase 1 — en préparation.** Rien n'est encore implémenté : le repo contient la spec, la mémoire projet et la liste de tâches. Voir [`docs/TASKS.md`](docs/TASKS.md) pour la suite.
+**Phase 1 — moteur jouable.** Le cœur des règles est implémenté et testé (T1→T6) : topologie du plateau,
+génération, boucle de tour/production, construction & validation, score, et interface terminal. Reste
+l'outillage de simulation par lots (T7). Voir [`docs/TASKS.md`](docs/TASKS.md).
 
 ## Le jeu en bref
 
@@ -55,12 +57,18 @@ Le site est servi par **GitHub Pages** depuis le dossier [`web/`](web/), déploy
 | [`docs/TASKS.md`](docs/TASKS.md) | Liste de tâches et jalons. |
 | [`CLAUDE.md`](CLAUDE.md) | Protocole de travail (dont consultation/mise à jour de la mémoire). |
 
-## Build (à venir)
+## Build & exécution
 
 ```sh
-# Phase 1 — cible prévue
-gcc -Wall -Wextra -std=c99 -o crypto-catan src/*.c
-./crypto-catan --seed 42 --players 3
+make test                 # compile et lance les 6 suites de tests (zéro warning)
+make                      # tests + binaire crypto-catan
+make run                  # démo automatique (40 tours, 3 joueurs)
+
+# Interface terminal
+./crypto-catan --seed 42 --players 3            # mode interactif (tapez 'help')
+./crypto-catan --seed 7  --players 4 --demo 60  # partie automatique de 60 tours
 ```
 
-Le Makefile et l'arborescence `src/` seront ajoutés au démarrage de l'implémentation.
+**Découpage** : `src/` contient le moteur pur (aucune I/O) — `hex`, `board`, `rng`, `setup`,
+`turn`, `build`, `score`, `game` — plus l'interface terminal (`ui.c`, `main.c`), seule couche d'I/O.
+Tests dans `tests/`. Avancement détaillé : [`docs/TASKS.md`](docs/TASKS.md).

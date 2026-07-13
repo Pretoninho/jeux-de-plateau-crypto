@@ -52,10 +52,12 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 - [x] Score : Position = 1, Desk = 2 — `score.c` (`game_score` recalculé + `game_leader`). Log par tour → côté I/O (T6).
 - [x] Ne pas bloquer sur l'atteinte de 10 en Phase 1 (vérifié par test : score > 10 possible, condition réelle en Phase 2).
 
-### T6 — Interface terminal (fine, au-dessus du moteur)
-- [ ] Affichage lisible du plateau et de l'état en terminal (aucune logique de règle ici).
-- [ ] Boucle hotseat 2-4 joueurs, saisie des actions.
-- [ ] CLI : `--seed`, `--players` (et `--layout` si Q1 le justifie).
+### T6 — Interface terminal (fine, au-dessus du moteur) ✅
+- [x] Affichage lisible du plateau et de l'état (`ui_render_board`/`ui_render_scores`, aucune règle ici).
+- [x] Boucle hotseat 2-4 (`ui_run` : commandes `roll`/`pos`/`line`/`desk`/`end`…), pilotable par `FILE*`.
+- [x] CLI : `--seed`, `--players`, `--demo` (binaire `crypto-catan`). Pas de `--layout` (D7 : aléatoire seedé).
+- [x] Placement initial d'amorçage `game_place_initial` (D10) + bot de démo. Log du score par tour (démo).
+- [x] Test (`tests/test_ui.c`) : rendu, boucle scriptée, erreurs, démo construisant au-delà de l'amorçage.
 
 ### T7 — Outillage
 - [ ] Makefile minimal (`gcc -Wall -Wextra -std=c99`, zéro warning).

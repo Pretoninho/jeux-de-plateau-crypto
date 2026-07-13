@@ -12,6 +12,10 @@
 #define MAX_EDGES    72
 #define MAX_PLAYERS  4
 
+/* Positions gratuites posées à la mise en place (amorçage de la production,
+ * standard Catan = 2 par joueur). Sans elles, aucune production ne démarre. */
+#define INITIAL_POSITIONS 2
+
 /* Actifs crypto (cf. spec §Plateau). RES_NONE = case Rekt / non assigné. */
 typedef enum {
     RES_NONE = 0,   /* Rekt : ne produit jamais rien */

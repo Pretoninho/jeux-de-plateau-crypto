@@ -4,7 +4,7 @@
 > et à mettre à jour dès qu'une décision est prise, qu'un état change, ou qu'une
 > question ouverte est tranchée. Voir le protocole dans [`../CLAUDE.md`](../CLAUDE.md).
 >
-> **Dernière mise à jour : 2026-07-12 (T5 fait — score/valorisation ; cœur des règles Phase 1 complet)**
+> **Dernière mise à jour : 2026-07-12 (T6 fait — interface terminal + placement initial d'amorçage)**
 
 ---
 
@@ -17,12 +17,11 @@
 
 ## 2. État courant
 
-- **Phase 1 — cœur des règles COMPLET (T1→T5).** Le moteur fait tourner N tours pour 2–4 joueurs, production et
-  construction comptabilisées et validées, score calculable, **sans crash et sans aucune I/O** — DoD cœur atteinte.
-  `src/` : `hex.{h,c}`, `types.h`, `board.{h,c}`, `rng.{h,c}`, `setup.{h,c}`, `turn.{h,c}`,
-  `build.{h,c}`, `score.{h,c}` (`game_score`/`game_leader`), `game.{h,c}`.
-  Tests : `test_board/setup/turn/build/score.c` (5 suites, `make test`).
-  Build **zéro warning** (`-Wall -Wextra -Werror -std=c99`). **Reste T6 (interface terminal) et T7 (outillage/simulation).**
+- **Phase 1 — cœur (T1→T5) + interface (T6) faits.** Moteur pur complet ; interface terminal jouable par-dessus.
+  Moteur `src/` : `hex.{h,c}`, `types.h`, `board.{h,c}`, `rng.{h,c}`, `setup.{h,c}`, `turn.{h,c}`,
+  `build.{h,c}`, `score.{h,c}`, `game.{h,c}` (+ `game_place_initial`). Interface : `ui.{h,c}`, `main.c` (binaire `crypto-catan`).
+  Tests : `test_board/setup/turn/build/score/ui.c` (6 suites, `make test`). CLI : `--seed`, `--players`, `--demo`.
+  Build **zéro warning** (`-Wall -Wextra -Werror -std=c99`). **Reste T7 (outillage/simulation par lots).**
 - Repo contient aussi : `README.md`, `docs/spec.md`, `docs/MEMORY.md`, `docs/TASKS.md`, `CLAUDE.md`, hook SessionStart,
   site vitrine `web/` + workflow de déploiement GitHub Pages (`.github/workflows/pages.yml`), `.gitignore`.
 - **Choix de modélisation T1 (implémente D3)** : représentation 100 % entière, sans flottant — une intersection = clé
@@ -33,8 +32,8 @@
 - **CI Pages** : ✅ résolu. PR #2 mergée, run #3 vert, **site en ligne** (HTTP 200) : https://pretoninho.github.io/jeux-de-plateau-crypto/
 - **Cadrage tranché** : Q1→aléatoire seedé (D7), Q2→Desk inclus (D8), Q3→générique 2–4 (D9). Q4 (nom) reportée.
   Nouveau point ouvert **Q5** : trouver une mécanique « signature » qui distingue le jeu de Catan.
-- Prochaine étape concrète : **T6 — interface terminal** (première I/O, au-dessus du moteur : affichage du plateau,
-  boucle hotseat 2–4, CLI `--seed`/`--players`). Le « log du score par tour » (T5/spec) se fera là, côté I/O. Puis T7.
+- Prochaine étape concrète : **T7 — outillage/simulation par lots** (cible façon `territoire_sol_risk.c` : lancer P
+  parties sur N graines, agréger stats — production moyenne, taux de blocage SOL, scores). Dernière tâche Phase 1.
 
 ## 3. Décisions figées (structurantes, coûteuses à changer)
 
@@ -46,6 +45,7 @@
 | D4 | État borné → **tableaux à taille fixe**, pas d'allocation dynamique dans la boucle de tour | 19 cases, ≤ 4 joueurs. |
 | D5 | RNG : **seed configurable en argument CLI** (runs reproductibles) | `rand()` pour commencer, isolé dans `roll_2d6()`. |
 | D6 | **Frontend web sur GitHub Pages** ; moteur C compilé en **WebAssembly (Emscripten)** pour la version jouable | Rend D2 encore plus critique : le moteur DOIT rester pur/sans I/O pour être embarquable en WASM. Interface terminal et interface web partagent le même moteur. |
+| D10 | **Placement initial gratuit** de `INITIAL_POSITIONS`=2 Positions/joueur (`game_place_initial`) pour amorcer la production | Sans amorçage, personne ne produit → personne ne peut construire (blocage). Placement auto réparti pour l'instant ; **choix interactif du placement = point ouvert** (cf. §5 Q6). Standard Catan. |
 | D7 | **Génération de plateau aléatoire seedée** dès le départ (pas de mode « layout fixe » séparé) | `--seed` rend chaque partie reproductible → tests déterministes ET spec respectée. Tranche Q1. |
 | D8 | **Desk (ville) inclus dès la Phase 1** | Déjà dans le périmètre spec (coût 2 Stables + 3 BTC), upgrade d'une Position. Boucle de jeu complète. Tranche Q2. |
 | D9 | **Moteur générique 2–4 joueurs** dès le début (tableaux dimensionnés à 4) ; valider d'abord à 2, puis l'adjacence à 3–4 | Évite un refactor ultérieur. Tranche Q3. |
@@ -81,6 +81,7 @@
 | Q3 | Nombre de joueurs cible pour la 1re version ? | ✅ tranchée → **générique 2–4, test à 2** (D9) |
 | Q4 | Nom de projet définitif ? | ⏸️ **reportée** — identifiants C neutres en attendant ; à trancher plus tard |
 | Q5 | **Divergence vs Catan** : quel(s) mécanisme(s)/expression propre(s) pour que le jeu ne soit pas un calque trait pour trait de Catan ? | ⬜ **ouvert** — à mûrir (pistes ci-dessous) |
+| Q6 | **Placement initial** : automatique réparti (actuel) ou choix interactif par les joueurs (règle Catan standard) ? | ⬜ **ouvert** — auto suffit pour la boucle ; interactif = confort de jeu |
 
 ### Pistes pour Q5 — divergence vs Catan (brainstorm, RIEN de tranché)
 
@@ -159,3 +160,10 @@ Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protèg
   le compteur `victory_points`** maintenu à la construction, classement, et non-blocage au-delà de 10 (Phase 1).
   **Cœur des règles Phase 1 complet (T1→T5)** : DoD cœur atteinte (N tours, P joueurs, sans crash, sans I/O).
   Zéro warning. Reste l'habillage : T6 (interface terminal) + T7 (outillage). Push branche + `main` sur demande.
+- **2026-07-12** — **T6 terminé** : interface terminal. `src/ui.{h,c}` (rendu plateau/scores, boucle de commandes
+  pilotable par `FILE*`, démo bot) + `src/main.c` (binaire `crypto-catan`, CLI `--seed`/`--players`/`--demo`).
+  Découverte à l'exécution : sans **placement initial**, aucune production → blocage ; ajout de `game_place_initial`
+  (**D10**, 2 Positions gratuites/joueur, réparties). Bot de démo : Position → Desk → Ligne. `tests/test_ui.c`
+  (pilotage scripté via `tmpfile`, rendu, erreurs, démo qui construit au-delà de l'amorçage). Zéro warning.
+  Constat conforme spec : sans trading, réunir les 4 actifs d'une Position est rare → progression surtout via Desk.
+  Nouveau point ouvert **Q6** (placement auto vs interactif). Prochain : T7.
