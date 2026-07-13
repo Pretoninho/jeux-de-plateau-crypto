@@ -21,7 +21,7 @@ int main(void) {
     Board b;
     board_build(&b);
 
-    /* Cardinalités de la topologie Catan. */
+    /* Cardinalités de la topologie du plateau. */
     assert(b.n_tiles == 19);
     assert(b.n_vertices == 54);
     assert(b.n_edges == 72);

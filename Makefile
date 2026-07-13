@@ -8,7 +8,7 @@ CFLAGS  = -Wall -Wextra -std=c99 -O2
 ENGINE  = src/hex.c src/board.c src/rng.c src/setup.c src/turn.c src/build.c src/score.c src/game.c
 UI      = src/ui.c
 HEADERS = $(wildcard src/*.h)
-BIN     = crypto-catan
+BIN     = crypto-board
 TESTS   = tests/test_board tests/test_setup tests/test_turn tests/test_build \
           tests/test_score tests/test_ui
 

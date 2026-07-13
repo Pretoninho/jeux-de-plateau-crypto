@@ -15,7 +15,7 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
   - [x] Q3 : **générique 2–4**, tester à 2 (D9).
   - [ ] Q4 : nom de projet — **reporté** (identifiants C neutres en attendant).
 - [x] **T0.2** — Ancrer la spec, la mémoire et le protocole de session dans le repo.
-- [ ] **T0.3** — **Q5 — mécanique « signature » qui distingue le jeu de Catan** (MEMORY §5, pistes listées).
+- [ ] **T0.3** — **Q5 — mécanique « signature » qui donne au jeu une identité propre** (MEMORY §5, pistes listées).
   Décision empirique, **après** que la boucle de base tourne (T1–T5). Ne pas sur-concevoir avant.
 
 ## Phase 1 — Moteur de règles (cœur, sans I/O)
@@ -55,7 +55,7 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 ### T6 — Interface terminal (fine, au-dessus du moteur) ✅
 - [x] Affichage lisible du plateau et de l'état (`ui_render_board`/`ui_render_scores`, aucune règle ici).
 - [x] Boucle hotseat 2-4 (`ui_run` : commandes `roll`/`pos`/`line`/`desk`/`end`…), pilotable par `FILE*`.
-- [x] CLI : `--seed`, `--players`, `--demo` (binaire `crypto-catan`). Pas de `--layout` (D7 : aléatoire seedé).
+- [x] CLI : `--seed`, `--players`, `--demo` (binaire `crypto-board`). Pas de `--layout` (D7 : aléatoire seedé).
 - [x] Placement initial d'amorçage `game_place_initial` (D10) + bot de démo. Log du score par tour (démo).
 - [x] Test (`tests/test_ui.c`) : rendu, boucle scriptée, erreurs, démo construisant au-delà de l'amorçage.
 

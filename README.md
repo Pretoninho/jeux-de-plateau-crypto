@@ -1,6 +1,6 @@
 # jeux-de-plateau-crypto
 
-Reskin crypto d'un jeu à mécaniques **Catan** (hexagones, dés, production, construction), écrit en **C99** comme projet d'apprentissage. Pas de deadline, pas de commande client — démarche empirique : valider le moteur de règles avant de sur-spécifier le rendu ou l'outillage.
+Reskin crypto d'un **jeu de plateau à ressources** (hexagones, dés, production, construction), écrit en **C99** comme projet d'apprentissage. Pas de deadline, pas de commande client — démarche empirique : valider le moteur de règles avant de sur-spécifier le rendu ou l'outillage.
 
 > ⚠️ **Distinct de TERRITOIRE** (jeu de cartes 5×7, capture en cascade). Aucune logique ni code partagé entre les deux projets — ne pas les confondre.
 
@@ -18,7 +18,7 @@ l'outillage de simulation par lots (T7). Voir [`docs/TASKS.md`](docs/TASKS.md).
 - **Constructions** : Ligne (route), Position (colonie), Desk (ville).
 - **Mode** : hotseat local, 2 à 4 joueurs, terminal uniquement (pas de graphismes en Phase 1).
 
-| Terme du jeu | Équivalent Catan |
+| Terme du jeu | Mécanique classique |
 |---|---|
 | Ligne | Route |
 | Position | Colonie |
@@ -61,12 +61,12 @@ Le site est servi par **GitHub Pages** depuis le dossier [`web/`](web/), déploy
 
 ```sh
 make test                 # compile et lance les 6 suites de tests (zéro warning)
-make                      # tests + binaire crypto-catan
+make                      # tests + binaire crypto-board
 make run                  # démo automatique (40 tours, 3 joueurs)
 
 # Interface terminal
-./crypto-catan --seed 42 --players 3            # mode interactif (tapez 'help')
-./crypto-catan --seed 7  --players 4 --demo 60  # partie automatique de 60 tours
+./crypto-board --seed 42 --players 3            # mode interactif (tapez 'help')
+./crypto-board --seed 7  --players 4 --demo 60  # partie automatique de 60 tours
 ```
 
 **Découpage** : `src/` contient le moteur pur (aucune I/O) — `hex`, `board`, `rng`, `setup`,

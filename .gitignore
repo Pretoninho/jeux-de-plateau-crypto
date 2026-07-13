@@ -5,6 +5,6 @@ tests/test_turn
 tests/test_build
 tests/test_score
 tests/test_ui
-crypto-catan
+crypto-board
 *.o
 *.out
