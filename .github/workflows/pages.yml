@@ -1,18 +1,18 @@
 name: Deploy frontend to GitHub Pages
 
-# Déploie le site statique du dossier web/ sur GitHub Pages.
-# ⚠️ Prérequis manuel (une seule fois) :
-#   Repo → Settings → Pages → Build and deployment → Source = "GitHub Actions".
+# Compile le moteur C en WebAssembly (Emscripten) puis déploie le dossier web/
+# (site + engine.js/engine.wasm) sur GitHub Pages.
 #
-# NOTE : aujourd'hui ce workflow ne publie que le statique (web/).
-# Quand le moteur C existera, ajouter ici une étape de build WebAssembly
-# (Emscripten : emcc ...) qui émet le .wasm/.js dans web/ avant l'upload.
+# Les artefacts WASM ne sont pas versionnés : ils sont régénérés ici à chaque
+# déploiement à partir des sources src/.
 
 on:
   push:
     branches: [main]
     paths:
       - 'web/**'
+      - 'src/**'
+      - 'Makefile'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -36,15 +36,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Installe Emscripten et compile le moteur en WASM (web/engine.js + .wasm).
+      # Tout dans un même step : emsdk_env.sh doit être sourcé dans le shell qui
+      # invoque emcc.
+      - name: Build WebAssembly engine
+        run: |
+          git clone --depth 1 https://github.com/emscripten-core/emsdk.git "$HOME/emsdk"
+          cd "$HOME/emsdk"
+          ./emsdk install latest
+          ./emsdk activate latest
+          source ./emsdk_env.sh
+          cd "$GITHUB_WORKSPACE"
+          make wasm
+          test -f web/engine.js && test -f web/engine.wasm
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
-          # Active GitHub Pages automatiquement si ce n'est pas déjà fait
-          # (évite l'erreur "Get Pages site failed / Not Found" au 1er run,
-          # plus besoin de basculer la source à la main dans Settings → Pages).
+          # Active GitHub Pages automatiquement si ce n'est pas déjà fait.
           enablement: true
 
-      - name: Upload static site (web/)
+      - name: Upload site (web/ + artefacts WASM)
         uses: actions/upload-pages-artifact@v3
         with:
           path: web

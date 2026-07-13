@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jeu de plateau crypto — moteur C</title>
-<meta name="description" content="Reskin crypto d'un jeu de plateau à ressources, moteur en C99. Frontend web via GitHub Pages (moteur jouable en WebAssembly à venir).">
+<meta name="description" content="Reskin crypto d'un jeu de plateau à ressources, moteur en C99, jouable dans le navigateur via WebAssembly.">
+<link rel="icon" href="data:,">
 <style>
   :root {
     --bg: #0b0e14;
@@ -98,12 +99,16 @@
 <body>
 <header>
   <div class="wrap">
-    <span class="badge"><span class="dot"></span> Phase 1 · moteur en développement</span>
+    <span class="badge"><span class="dot"></span> Phase 1 · jouable dans le navigateur</span>
     <h1>Jeu de plateau <span class="grad">crypto</span></h1>
     <p class="lede">Reskin crypto d'un jeu de plateau à ressources — hexagones, dés, production, construction.
     Moteur écrit en C99 comme projet d'apprentissage, avec une frontière stricte entre la logique de règles et l'affichage.</p>
-    <p class="warn">Cette page est une vitrine. La version jouable arrivera en compilant le moteur C en
-    <strong>WebAssembly</strong> — la séparation moteur / I/O du projet est précisément ce qui rend ce portage possible.</p>
+    <p style="margin:26px 0 6px;">
+      <a href="play.html" style="display:inline-block; background:linear-gradient(90deg,var(--accent),#ffb454);
+        color:#1a1204; font-weight:700; padding:13px 26px; border-radius:12px; text-decoration:none; font-size:17px;">▶ Jouer maintenant</a>
+    </p>
+    <p class="warn">Le moteur C tourne directement dans le navigateur, compilé en <strong>WebAssembly</strong> —
+    la séparation moteur / I/O du projet est précisément ce qui rend ce portage possible.</p>
   </div>
 </header>
 
