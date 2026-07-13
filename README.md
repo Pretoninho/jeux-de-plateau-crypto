@@ -6,9 +6,10 @@ Reskin crypto d'un **jeu de plateau à ressources** (hexagones, dés, production
 
 ## État actuel
 
-**Phase 1 — moteur jouable.** Le cœur des règles est implémenté et testé (T1→T6) : topologie du plateau,
-génération, boucle de tour/production, construction & validation, score, et interface terminal. Reste
-l'outillage de simulation par lots (T7). Voir [`docs/TASKS.md`](docs/TASKS.md).
+**Phase 1 — complète.** Le moteur de règles (topologie, génération, tour/production, construction & validation,
+score), l'interface terminal et l'outillage de simulation par lots sont implémentés et testés (T1→T7, 7 suites,
+zéro warning). Definition of Done atteinte. Voir [`docs/TASKS.md`](docs/TASKS.md). Suite : Phase 2 (trading,
+Signal, Margin Call…).
 
 ## Le jeu en bref
 
@@ -60,13 +61,15 @@ Le site est servi par **GitHub Pages** depuis le dossier [`web/`](web/), déploy
 ## Build & exécution
 
 ```sh
-make test                 # compile et lance les 6 suites de tests (zéro warning)
+make test                 # compile et lance les 7 suites de tests (zéro warning)
 make                      # tests + binaire crypto-board
 make run                  # démo automatique (40 tours, 3 joueurs)
+make sim                  # simulation par lots (1000 parties) + rapport agrégé
 
 # Interface terminal
 ./crypto-board --seed 42 --players 3            # mode interactif (tapez 'help')
 ./crypto-board --seed 7  --players 4 --demo 60  # partie automatique de 60 tours
+./crypto-board --players 4 --sim 1000 --turns 80  # simulation + stats (production, SOL, scores)
 ```
 
 **Découpage** : `src/` contient le moteur pur (aucune I/O) — `hex`, `board`, `rng`, `setup`,

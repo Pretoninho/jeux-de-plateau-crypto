@@ -59,10 +59,10 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 - [x] Placement initial d'amorçage `game_place_initial` (D10) + bot de démo. Log du score par tour (démo).
 - [x] Test (`tests/test_ui.c`) : rendu, boucle scriptée, erreurs, démo construisant au-delà de l'amorçage.
 
-### T7 — Outillage
-- [ ] Makefile minimal (`gcc -Wall -Wextra -std=c99`, zéro warning).
-- [ ] Arborescence `src/` (moteur) séparée de l'interface.
-- [ ] Cible de simulation par lots pour valider le moteur sans I/O interactive.
+### T7 — Outillage ✅
+- [x] Makefile (`gcc -Wall -Wextra -std=c99`, zéro warning ; cibles `test`/`run`/`sim`).
+- [x] Arborescence `src/` : moteur pur séparé de l'interface (`ui.c`/`main.c`) et de l'outillage (`sim.c`).
+- [x] Cible de simulation par lots (`sim.{h,c}`, `--sim`/`make sim`) : P parties, stats agrégées, sans I/O interactive.
 
 ## Volet Web — GitHub Pages (transverse, cf. MEMORY D6)
 
@@ -74,11 +74,14 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 - [ ] **T8.5** — Brancher l'étape de build WASM dans `pages.yml` (émettre `.wasm`/`.js` dans `web/` avant l'upload).
 - [ ] **T8.6** — Vérifier que le moteur reste **pur/sans I/O** : la couche WASM ne fait qu'exposer des fonctions, aucune règle côté JS.
 
-## Definition of Done — Phase 1
+## Definition of Done — Phase 1 ✅ ATTEINTE
 
 > Le moteur fait tourner N tours pour P joueurs (2-4), production et construction correctement
 > comptabilisées et validées, **sans crash**, et le moteur de règles est testable/appelable
 > **sans aucune I/O** (façon `territoire_sol_risk.c`).
+
+Validée : 7 suites de test (`make test`), simulation par lots (`make sim`), zéro warning
+(`-Wall -Wextra -Werror -std=c99`). Interface terminal jouable (`crypto-board`).
 
 ## Hors périmètre (Phase 2+)
 

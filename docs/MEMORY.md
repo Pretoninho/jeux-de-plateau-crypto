@@ -4,7 +4,7 @@
 > et à mettre à jour dès qu'une décision est prise, qu'un état change, ou qu'une
 > question ouverte est tranchée. Voir le protocole dans [`../CLAUDE.md`](../CLAUDE.md).
 >
-> **Dernière mise à jour : 2026-07-12 (retrait des mentions « Catan » ; binaire → `crypto-board`)**
+> **Dernière mise à jour : 2026-07-12 (T7 fait — simulation par lots ; PHASE 1 COMPLÈTE)**
 
 ---
 
@@ -17,11 +17,13 @@
 
 ## 2. État courant
 
-- **Phase 1 — cœur (T1→T5) + interface (T6) faits.** Moteur pur complet ; interface terminal jouable par-dessus.
+- **Phase 1 COMPLÈTE (T1→T7).** Moteur pur + interface terminal + outillage de simulation par lots.
   Moteur `src/` : `hex.{h,c}`, `types.h`, `board.{h,c}`, `rng.{h,c}`, `setup.{h,c}`, `turn.{h,c}`,
-  `build.{h,c}`, `score.{h,c}`, `game.{h,c}` (+ `game_place_initial`). Interface : `ui.{h,c}`, `main.c` (binaire `crypto-board`).
-  Tests : `test_board/setup/turn/build/score/ui.c` (6 suites, `make test`). CLI : `--seed`, `--players`, `--demo`.
-  Build **zéro warning** (`-Wall -Wextra -Werror -std=c99`). **Reste T7 (outillage/simulation par lots).**
+  `build.{h,c}`, `score.{h,c}`, `game.{h,c}` (+ `game_place_initial`). Interface : `ui.{h,c}`, `main.c`.
+  Outillage : `sim.{h,c}` (`sim_run`/`sim_report`). Binaire `crypto-board`.
+  Tests : `test_board/setup/turn/build/score/ui/sim.c` (7 suites, `make test`). CLI : `--seed`, `--players`, `--demo`,
+  `--sim`, `--turns`. `make run` (démo), `make sim` (1000 parties). Build **zéro warning** (`-Wall -Wextra -Werror -std=c99`).
+  **Definition of Done Phase 1 atteinte.** Suite : Phase 2 (trading, Signal, Margin Call…) et/ou Q5 (identité mécanique).
 - Repo contient aussi : `README.md`, `docs/spec.md`, `docs/MEMORY.md`, `docs/TASKS.md`, `CLAUDE.md`, hook SessionStart,
   site vitrine `web/` + workflow de déploiement GitHub Pages (`.github/workflows/pages.yml`), `.gitignore`.
 - **Choix de modélisation T1 (implémente D3)** : représentation 100 % entière, sans flottant — une intersection = clé
@@ -32,8 +34,8 @@
 - **CI Pages** : ✅ résolu. PR #2 mergée, run #3 vert, **site en ligne** (HTTP 200) : https://pretoninho.github.io/jeux-de-plateau-crypto/
 - **Cadrage tranché** : Q1→aléatoire seedé (D7), Q2→Desk inclus (D8), Q3→générique 2–4 (D9). Q4 (nom) reportée.
   Nouveau point ouvert **Q5** : trouver une mécanique « signature » qui donne au jeu une identité propre.
-- Prochaine étape concrète : **T7 — outillage/simulation par lots** (cible façon `territoire_sol_risk.c` : lancer P
-  parties sur N graines, agréger stats — production moyenne, taux de blocage SOL, scores). Dernière tâche Phase 1.
+- Prochaine étape concrète : **Phase 2** (hors scope Phase 1) — trading/Bourse, Signal (cartes dev), Margin Call (le 7),
+  condition de victoire à 10 ; et/ou trancher **Q5** (mécanique signature). Le moteur Phase 1 est stable et validé.
 
 ## 3. Décisions figées (structurantes, coûteuses à changer)
 
@@ -103,8 +105,11 @@ Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protèg
 
 ## 6. Points connus & acceptés (ne pas rouvrir sans raison)
 
-- **SOL n'a qu'une case** → ~6,8 % des parties simulées ont zéro production de SOL. Ce n'est **pas un bug** :
-  distribution volontaire (pondération √dominance). À rouvrir seulement si le playtest confirme la frustration.
+- **SOL n'a qu'une case** → parties sans production de SOL. Ce n'est **pas un bug** : distribution volontaire
+  (pondération √dominance). À rouvrir seulement si le playtest confirme la frustration.
+  *Mesure de notre `sim` (2026-07-12, 1000 parties, 4 joueurs, 2 pos. init., 80 tours, bot) : **~26 %** de parties
+  sans SOL — vs ~6,8 % cité par la spec (modèle `territoire_sol_risk.c` différent). Production par tuile homogène
+  (~8–9/tuile/partie tous actifs confondus) : l'écart vient de la **couverture** du plateau, pas d'un défaut de prod.*
 - **Somme = 7** en Phase 1 : Margin Call hors scope → traiter comme un tour sans effet (pas de production, pas de vol).
 - **Condition de victoire** : ne pas bloquer le moteur sur l'atteinte de 10 points en Phase 1 (pas de trading).
   Logger le score à chaque tour ; condition réelle à valider en Phase 2.
@@ -171,3 +176,8 @@ Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protèg
   document de référence, sa Note IP mentionne Catan à dessein — choix utilisateur). Reformulations sans perte de sens
   (« jeu de plateau à ressources », « mécanique classique », « identité mécanique propre »…). **Binaire renommé
   `crypto-catan` → `crypto-board`** (nom de travail neutre, Q4 toujours reportée). Build/tests OK, zéro warning.
+- **2026-07-12** — **T7 terminé → PHASE 1 COMPLÈTE.** `src/sim.{h,c}` : `sim_run` (P parties sur graines successives,
+  bot auto, mesure la production par delta post-`game_produce` avant dépense) + `sim_report`. `main.c` : modes
+  `--sim`/`--turns` ; `make sim`. `tests/test_sim.c` : invariantes (Rekt=0, BTC quasi toujours produit, SOL plus rare
+  que BTC), reproductibilité, effet de graine. Constat empirique consigné en §6 (SOL ~26 % sous notre modèle).
+  **DoD Phase 1 atteinte.** 7 suites de test, zéro warning. Suite : Phase 2 et/ou Q5.
