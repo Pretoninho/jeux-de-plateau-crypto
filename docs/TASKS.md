@@ -15,7 +15,7 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
   - [x] Q3 : **générique 2–4**, tester à 2 (D9).
   - [ ] Q4 : nom de projet — **reporté** (identifiants C neutres en attendant).
 - [x] **T0.2** — Ancrer la spec, la mémoire et le protocole de session dans le repo.
-- [ ] **T0.3** — **Q5 — mécanique « signature » qui distingue le jeu de Catan** (MEMORY §5, pistes listées).
+- [ ] **T0.3** — **Q5 — mécanique « signature » qui donne au jeu une identité propre** (MEMORY §5, pistes listées).
   Décision empirique, **après** que la boucle de base tourne (T1–T5). Ne pas sur-concevoir avant.
 
 ## Phase 1 — Moteur de règles (cœur, sans I/O)
@@ -52,15 +52,17 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 - [x] Score : Position = 1, Desk = 2 — `score.c` (`game_score` recalculé + `game_leader`). Log par tour → côté I/O (T6).
 - [x] Ne pas bloquer sur l'atteinte de 10 en Phase 1 (vérifié par test : score > 10 possible, condition réelle en Phase 2).
 
-### T6 — Interface terminal (fine, au-dessus du moteur)
-- [ ] Affichage lisible du plateau et de l'état en terminal (aucune logique de règle ici).
-- [ ] Boucle hotseat 2-4 joueurs, saisie des actions.
-- [ ] CLI : `--seed`, `--players` (et `--layout` si Q1 le justifie).
+### T6 — Interface terminal (fine, au-dessus du moteur) ✅
+- [x] Affichage lisible du plateau et de l'état (`ui_render_board`/`ui_render_scores`, aucune règle ici).
+- [x] Boucle hotseat 2-4 (`ui_run` : commandes `roll`/`pos`/`line`/`desk`/`end`…), pilotable par `FILE*`.
+- [x] CLI : `--seed`, `--players`, `--demo` (binaire `crypto-board`). Pas de `--layout` (D7 : aléatoire seedé).
+- [x] Placement initial d'amorçage `game_place_initial` (D10) + bot de démo. Log du score par tour (démo).
+- [x] Test (`tests/test_ui.c`) : rendu, boucle scriptée, erreurs, démo construisant au-delà de l'amorçage.
 
-### T7 — Outillage
-- [ ] Makefile minimal (`gcc -Wall -Wextra -std=c99`, zéro warning).
-- [ ] Arborescence `src/` (moteur) séparée de l'interface.
-- [ ] Cible de simulation par lots pour valider le moteur sans I/O interactive.
+### T7 — Outillage ✅
+- [x] Makefile (`gcc -Wall -Wextra -std=c99`, zéro warning ; cibles `test`/`run`/`sim`).
+- [x] Arborescence `src/` : moteur pur séparé de l'interface (`ui.c`/`main.c`) et de l'outillage (`sim.c`).
+- [x] Cible de simulation par lots (`sim.{h,c}`, `--sim`/`make sim`) : P parties, stats agrégées, sans I/O interactive.
 
 ## Volet Web — GitHub Pages (transverse, cf. MEMORY D6)
 
@@ -72,11 +74,14 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 - [ ] **T8.5** — Brancher l'étape de build WASM dans `pages.yml` (émettre `.wasm`/`.js` dans `web/` avant l'upload).
 - [ ] **T8.6** — Vérifier que le moteur reste **pur/sans I/O** : la couche WASM ne fait qu'exposer des fonctions, aucune règle côté JS.
 
-## Definition of Done — Phase 1
+## Definition of Done — Phase 1 ✅ ATTEINTE
 
 > Le moteur fait tourner N tours pour P joueurs (2-4), production et construction correctement
 > comptabilisées et validées, **sans crash**, et le moteur de règles est testable/appelable
 > **sans aucune I/O** (façon `territoire_sol_risk.c`).
+
+Validée : 7 suites de test (`make test`), simulation par lots (`make sim`), zéro warning
+(`-Wall -Wextra -Werror -std=c99`). Interface terminal jouable (`crypto-board`).
 
 ## Hors périmètre (Phase 2+)
 

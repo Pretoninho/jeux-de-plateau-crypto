@@ -1,16 +1,21 @@
 # Makefile minimal — Phase 1 (D1 : C99, zéro warning toléré).
-# Aucune dépendance externe. Le moteur (src/) reste sans I/O ;
-# les tests (tests/) sont le seul point d'affichage pour l'instant.
+# Aucune dépendance externe.
+#   src/ (hors ui.c/main.c) = moteur pur, sans I/O.
+#   src/ui.c, src/main.c    = interface terminal (seule couche d'I/O).
 
 CC      = gcc
 CFLAGS  = -Wall -Wextra -std=c99 -O2
 ENGINE  = src/hex.c src/board.c src/rng.c src/setup.c src/turn.c src/build.c src/score.c src/game.c
+UI      = src/ui.c
+SIM     = src/sim.c
 HEADERS = $(wildcard src/*.h)
-TESTS   = tests/test_board tests/test_setup tests/test_turn tests/test_build tests/test_score
+BIN     = crypto-board
+TESTS   = tests/test_board tests/test_setup tests/test_turn tests/test_build \
+          tests/test_score tests/test_ui tests/test_sim
 
-.PHONY: all test clean
+.PHONY: all test run sim clean
 
-all: test
+all: test $(BIN)
 
 # Compile et exécute tous les tests.
 test: $(TESTS)
@@ -19,6 +24,20 @@ test: $(TESTS)
 	./tests/test_turn
 	./tests/test_build
 	./tests/test_score
+	./tests/test_ui
+	./tests/test_sim
+
+# Binaire de jeu (interface terminal + simulation).
+$(BIN): src/main.c $(ENGINE) $(UI) $(SIM) $(HEADERS)
+	$(CC) $(CFLAGS) -o $@ src/main.c $(ENGINE) $(UI) $(SIM)
+
+# Démonstration automatique.
+run: $(BIN)
+	./$(BIN) --seed 1 --players 3 --demo 40
+
+# Simulation par lots.
+sim: $(BIN)
+	./$(BIN) --seed 1 --players 4 --sim 1000 --turns 80
 
 tests/test_board: tests/test_board.c $(ENGINE) $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ tests/test_board.c $(ENGINE)
@@ -35,5 +54,11 @@ tests/test_build: tests/test_build.c $(ENGINE) $(HEADERS)
 tests/test_score: tests/test_score.c $(ENGINE) $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ tests/test_score.c $(ENGINE)
 
+tests/test_ui: tests/test_ui.c $(ENGINE) $(UI) $(HEADERS)
+	$(CC) $(CFLAGS) -o $@ tests/test_ui.c $(ENGINE) $(UI)
+
+tests/test_sim: tests/test_sim.c $(ENGINE) $(SIM) $(HEADERS)
+	$(CC) $(CFLAGS) -o $@ tests/test_sim.c $(ENGINE) $(SIM)
+
 clean:
-	rm -f $(TESTS)
+	rm -f $(TESTS) $(BIN)

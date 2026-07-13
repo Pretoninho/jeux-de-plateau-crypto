@@ -5,7 +5,7 @@
  *   - Position (intersection) : 1 SOL + 1 ETH + 1 Stable + 1 Alt
  *   - Desk     (upgrade)      : 2 Stable + 3 BTC
  *
- * Adjacence (règles standard Catan, telles que précisées par la spec) :
+ * Adjacence (règles d'adjacence standard, telles que précisées par la spec) :
  *   - Position : intersection libre ET aucune intersection voisine occupée
  *                (règle de distance). NB : la spec Phase 1 n'exige pas de
  *                connexion routière pour la Position — voir MEMORY (point ouvert).

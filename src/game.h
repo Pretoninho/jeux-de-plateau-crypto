@@ -34,4 +34,10 @@ typedef struct {
  * n_players attendu dans [2, MAX_PLAYERS] (D9). */
 void game_init(GameState *g, int n_players, unsigned int seed);
 
+/* Mise en place : pose `per_player` Positions gratuites par joueur (respecte la
+ * règle de distance, ignore le coût), pour amorcer la production. À appeler
+ * après game_init(). Le placement est ici automatique (choix interactif : plus
+ * tard). Sans cet amorçage, aucune production ne peut démarrer. */
+void game_place_initial(GameState *g, int per_player);
+
 #endif /* GAME_H */

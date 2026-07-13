@@ -1,12 +1,15 @@
 # jeux-de-plateau-crypto
 
-Reskin crypto d'un jeu à mécaniques **Catan** (hexagones, dés, production, construction), écrit en **C99** comme projet d'apprentissage. Pas de deadline, pas de commande client — démarche empirique : valider le moteur de règles avant de sur-spécifier le rendu ou l'outillage.
+Reskin crypto d'un **jeu de plateau à ressources** (hexagones, dés, production, construction), écrit en **C99** comme projet d'apprentissage. Pas de deadline, pas de commande client — démarche empirique : valider le moteur de règles avant de sur-spécifier le rendu ou l'outillage.
 
 > ⚠️ **Distinct de TERRITOIRE** (jeu de cartes 5×7, capture en cascade). Aucune logique ni code partagé entre les deux projets — ne pas les confondre.
 
 ## État actuel
 
-**Phase 1 — en préparation.** Rien n'est encore implémenté : le repo contient la spec, la mémoire projet et la liste de tâches. Voir [`docs/TASKS.md`](docs/TASKS.md) pour la suite.
+**Phase 1 — complète.** Le moteur de règles (topologie, génération, tour/production, construction & validation,
+score), l'interface terminal et l'outillage de simulation par lots sont implémentés et testés (T1→T7, 7 suites,
+zéro warning). Definition of Done atteinte. Voir [`docs/TASKS.md`](docs/TASKS.md). Suite : Phase 2 (trading,
+Signal, Margin Call…).
 
 ## Le jeu en bref
 
@@ -16,7 +19,7 @@ Reskin crypto d'un jeu à mécaniques **Catan** (hexagones, dés, production, co
 - **Constructions** : Ligne (route), Position (colonie), Desk (ville).
 - **Mode** : hotseat local, 2 à 4 joueurs, terminal uniquement (pas de graphismes en Phase 1).
 
-| Terme du jeu | Équivalent Catan |
+| Terme du jeu | Mécanique classique |
 |---|---|
 | Ligne | Route |
 | Position | Colonie |
@@ -55,12 +58,20 @@ Le site est servi par **GitHub Pages** depuis le dossier [`web/`](web/), déploy
 | [`docs/TASKS.md`](docs/TASKS.md) | Liste de tâches et jalons. |
 | [`CLAUDE.md`](CLAUDE.md) | Protocole de travail (dont consultation/mise à jour de la mémoire). |
 
-## Build (à venir)
+## Build & exécution
 
 ```sh
-# Phase 1 — cible prévue
-gcc -Wall -Wextra -std=c99 -o crypto-catan src/*.c
-./crypto-catan --seed 42 --players 3
+make test                 # compile et lance les 7 suites de tests (zéro warning)
+make                      # tests + binaire crypto-board
+make run                  # démo automatique (40 tours, 3 joueurs)
+make sim                  # simulation par lots (1000 parties) + rapport agrégé
+
+# Interface terminal
+./crypto-board --seed 42 --players 3            # mode interactif (tapez 'help')
+./crypto-board --seed 7  --players 4 --demo 60  # partie automatique de 60 tours
+./crypto-board --players 4 --sim 1000 --turns 80  # simulation + stats (production, SOL, scores)
 ```
 
-Le Makefile et l'arborescence `src/` seront ajoutés au démarrage de l'implémentation.
+**Découpage** : `src/` contient le moteur pur (aucune I/O) — `hex`, `board`, `rng`, `setup`,
+`turn`, `build`, `score`, `game` — plus l'interface terminal (`ui.c`, `main.c`), seule couche d'I/O.
+Tests dans `tests/`. Avancement détaillé : [`docs/TASKS.md`](docs/TASKS.md).

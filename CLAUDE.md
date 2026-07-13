@@ -4,7 +4,7 @@ Guide pour tout agent (Claude Code ou humain) travaillant sur ce dépôt.
 
 ## Projet
 
-Reskin crypto d'un jeu à mécaniques Catan, moteur en **C99**, projet d'apprentissage.
+Reskin crypto d'un jeu de plateau à ressources, moteur en **C99**, projet d'apprentissage.
 **Distinct de TERRITOIRE** (jeu de cartes) — aucun code partagé, ne pas confondre.
 
 Spec de référence : [`docs/spec.md`](docs/spec.md).

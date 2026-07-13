@@ -4,5 +4,8 @@ tests/test_setup
 tests/test_turn
 tests/test_build
 tests/test_score
+tests/test_ui
+tests/test_sim
+crypto-board
 *.o
 *.out
