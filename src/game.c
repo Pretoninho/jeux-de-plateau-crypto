@@ -41,13 +41,7 @@ void game_place_initial(GameState *g, int per_player) {
         for (int p = 0; p < g->n_players; p++) {
             for (int s = 0; s < nv; s++) {
                 int v = (cursor + s) % nv;
-                /* Valide si la règle de distance passe, coût ignoré (gratuit) :
-                 * can_build_position renvoie OK ou ERR_COST dans ce cas. */
-                BuildResult r = can_build_position(g, p, v);
-                if (r == BUILD_OK || r == BUILD_ERR_COST) {
-                    g->vertex_building[v] = BUILD_POSITION;
-                    g->vertex_owner[v] = p;
-                    g->players[p].victory_points += 1;
+                if (place_position_free(g, p, v) == BUILD_OK) {
                     cursor = (v + step) % nv;
                     break;
                 }

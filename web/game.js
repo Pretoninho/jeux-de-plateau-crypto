@@ -16,6 +16,7 @@ const BUILD_MSG = {
 let M = null;            // module Emscripten
 const F = {};            // fonctions wasm_* wrappées
 let rolled = false;
+let setup = { active: false, queue: [], idx: 0 };   // phase de mise en place
 
 // Géométrie statique (recalculée à chaque nouvelle partie).
 let TX = [], TY = [], VX = [], VY = [], EDGES = [];
@@ -26,6 +27,9 @@ function wrapAll() {
   const sig = {
     wasm_new_game: [null, ["number", "number"]],
     wasm_n_players: ["number", []], wasm_current: ["number", []],
+    wasm_initial_positions: ["number", []],
+    wasm_place_free: ["number", ["number", "number"]],
+    wasm_can_place_free: ["number", ["number", "number"]],
     wasm_n_tiles: ["number", []], wasm_n_vertices: ["number", []], wasm_n_edges: ["number", []],
     wasm_tile_resource: ["number", ["number"]], wasm_tile_number: ["number", ["number"]],
     wasm_tile_px: ["number", ["number"]], wasm_tile_py: ["number", ["number"]],
@@ -41,6 +45,19 @@ function wrapAll() {
     wasm_can_build_desk: ["number", ["number"]],
   };
   for (const name in sig) F[name] = M.cwrap(name, sig[name][0], sig[name][1]);
+}
+
+// Joueur actif : celui qui pose en phase de mise en place, sinon le joueur courant.
+function activePlayer() { return setup.active ? setup.queue[setup.idx] : F.wasm_current(); }
+
+// Ordre en serpentin : 0,1,..,n-1, n-1,..,1,0, … sur `rounds` tours.
+function buildSetupQueue(n, rounds) {
+  const q = [];
+  for (let r = 0; r < rounds; r++) {
+    if (r % 2 === 0) for (let p = 0; p < n; p++) q.push(p);
+    else for (let p = n - 1; p >= 0; p--) q.push(p);
+  }
+  return q;
 }
 
 function readGeometry() {
@@ -70,6 +87,13 @@ function hexPoints(cx, cy, r) {
   return p.join(" ");
 }
 
+// Une intersection vide est-elle posable par le joueur actif ?
+function vertexBuildable(v) {
+  return setup.active
+    ? F.wasm_can_place_free(activePlayer(), v) === 0
+    : F.wasm_can_build_position(v) === 0;
+}
+
 function renderBoard() {
   const svg = document.getElementById("board");
   const w = (bounds.maxX - bounds.minX) * S + 2 * PAD;
@@ -77,7 +101,6 @@ function renderBoard() {
   svg.setAttribute("viewBox", `0 0 ${w.toFixed(0)} ${h.toFixed(0)}`);
 
   let s = "";
-  // Tuiles
   for (let i = 0; i < TX.length; i++) {
     const cx = sx(TX[i]), cy = sy(TY[i]);
     const res = F.wasm_tile_resource(i), num = F.wasm_tile_number(i);
@@ -89,7 +112,6 @@ function renderBoard() {
       s += `<text x="${cx}" y="${cy + S * 0.24}" text-anchor="middle" font-size="${(S * 0.34).toFixed(0)}" font-weight="700" fill="${hot ? "#d23b3b" : "#1a1a1a"}">${num}</text>`;
     }
   }
-  // Arêtes (Lignes)
   for (let e = 0; e < EDGES.length; e++) {
     const [a, b] = EDGES[e];
     const x1 = sx(VX[a]), y1 = sy(VY[a]), x2 = sx(VX[b]), y2 = sy(VY[b]);
@@ -99,7 +121,6 @@ function renderBoard() {
     s += `<line data-edge="${e}" class="edge${built ? " built" : ""}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" `
        + `stroke-width="${(S * 0.13).toFixed(1)}"${col ? ` stroke="${col}"` : ""}/>`;
   }
-  // Intersections (Positions / Desks)
   for (let v = 0; v < VX.length; v++) {
     const cx = sx(VX[v]), cy = sy(VY[v]);
     const bd = F.wasm_vertex_building(v), ow = F.wasm_vertex_owner(v);
@@ -109,7 +130,7 @@ function renderBoard() {
       const r = S * 0.20;
       s += `<rect data-vtx="${v}" class="vtx" x="${(cx - r).toFixed(1)}" y="${(cy - r).toFixed(1)}" width="${(2 * r).toFixed(1)}" height="${(2 * r).toFixed(1)}" rx="3" fill="${P_COLOR[ow]}" stroke="#0b0e14" stroke-width="1.5"/>`;
     } else {
-      if (F.wasm_can_build_position(v) === 0) {
+      if (vertexBuildable(v)) {
         s += `<circle class="buildable" cx="${cx}" cy="${cy}" r="${(S * 0.20).toFixed(1)}"><animate attributeName="opacity" values="0.35;0.9;0.35" dur="1.4s" repeatCount="indefinite"/></circle>`;
       }
       s += `<circle cx="${cx}" cy="${cy}" r="${(S * 0.08).toFixed(1)}" fill="#3a4557"/>`;
@@ -120,7 +141,7 @@ function renderBoard() {
 }
 
 function renderPanels() {
-  const cur = F.wasm_current(), n = F.wasm_n_players();
+  const cur = activePlayer(), n = F.wasm_n_players();
   let s = "";
   for (let p = 0; p < n; p++) {
     s += `<div class="pcard${p === cur ? " active" : ""}">`
@@ -133,17 +154,50 @@ function renderPanels() {
     s += `</div></div>`;
   }
   document.getElementById("panels").innerHTML = s;
-
-  const dot = document.getElementById("curdot");
-  dot.style.background = P_COLOR[cur];
-  document.getElementById("curname").textContent = P_NAME[cur];
 }
 
-function render() { renderBoard(); renderPanels(); }
+function updateTurnBar() {
+  const w = activePlayer();
+  const label = setup.active ? "Mise en place —" : "Tour de";
+  document.getElementById("who").innerHTML =
+    `${label} <span class="dot" style="background:${P_COLOR[w]}"></span> ${P_NAME[w]}`;
+
+  const roll = document.getElementById("roll");
+  const end = document.getElementById("end");
+  const dice = document.getElementById("dice");
+  roll.disabled = setup.active || rolled;
+  end.disabled = setup.active;
+
+  if (setup.active) {
+    dice.innerHTML = `<small>placement ${setup.idx + 1}/${setup.queue.length}</small>`;
+  } else if (!rolled) {
+    dice.innerHTML = "<small>lancez les dés</small>";
+  }
+}
+
+function render() { renderBoard(); renderPanels(); updateTurnBar(); }
 
 function setMsg(t) { document.getElementById("msg").textContent = t; }
 
 function onVertexClick(v) {
+  if (setup.active) {
+    const who = setup.queue[setup.idx];
+    const r = F.wasm_place_free(who, v);
+    if (r === 0) {
+      setup.idx++;
+      if (setup.idx >= setup.queue.length) {
+        setup.active = false;
+        setMsg("Mise en place terminée. Au tour de " + P_NAME[F.wasm_current()] + " — lancez les dés.");
+      } else {
+        setMsg("Position posée. Au tour de " + P_NAME[setup.queue[setup.idx]] + " de placer.");
+      }
+    } else {
+      setMsg("Placement : " + BUILD_MSG[r]);
+    }
+    render();
+    return;
+  }
+
   const bd = F.wasm_vertex_building(v), ow = F.wasm_vertex_owner(v), cur = F.wasm_current();
   let r;
   if (bd === 0) { r = F.wasm_build_position(v); setMsg("Position : " + BUILD_MSG[r]); }
@@ -153,6 +207,7 @@ function onVertexClick(v) {
 }
 
 function onEdgeClick(e) {
+  if (setup.active) { setMsg("Placez d'abord vos Positions de départ."); return; }
   const r = F.wasm_build_line(e);
   setMsg("Ligne : " + BUILD_MSG[r]);
   render();
@@ -162,29 +217,27 @@ function newGame() {
   const players = parseInt(document.getElementById("players").value, 10);
   const seed = (parseInt(document.getElementById("seed").value, 10) || 0) >>> 0;
   F.wasm_new_game(players, seed);
+  const rounds = F.wasm_initial_positions();
+  setup = { active: true, queue: buildSetupQueue(players, rounds), idx: 0 };
   rolled = false;
-  document.getElementById("roll").disabled = false;
-  document.getElementById("dice").innerHTML = "<small>lancez les dés</small>";
-  setMsg("Nouvelle partie — " + players + " joueurs, graine " + seed + ".");
   readGeometry();
+  setMsg(`Mise en place : chaque joueur place ${rounds} Positions (cliquez une intersection verte). ${P_NAME[setup.queue[0]]} commence.`);
   render();
 }
 
 function doRoll() {
-  if (rolled) return;
+  if (setup.active || rolled) return;
   const d = F.wasm_roll();
   rolled = true;
-  document.getElementById("roll").disabled = true;
   document.getElementById("dice").innerHTML = `🎲 <b>${d}</b>` + (d === 7 ? " <small>Margin Call</small>" : "");
   setMsg(d === 7 ? "7 — Margin Call (aucun effet en Phase 1)." : "Production distribuée.");
   render();
 }
 
 function endTurn() {
+  if (setup.active) return;
   F.wasm_end_turn();
   rolled = false;
-  document.getElementById("roll").disabled = false;
-  document.getElementById("dice").innerHTML = "<small>lancez les dés</small>";
   setMsg("Au tour de " + P_NAME[F.wasm_current()] + ".");
   render();
 }
