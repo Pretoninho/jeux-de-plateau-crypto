@@ -4,7 +4,7 @@
 > et à mettre à jour dès qu'une décision est prise, qu'un état change, ou qu'une
 > question ouverte est tranchée. Voir le protocole dans [`../CLAUDE.md`](../CLAUDE.md).
 >
-> **Dernière mise à jour : 2026-07-13 (T8 — jeu jouable dans le navigateur via WebAssembly)**
+> **Dernière mise à jour : 2026-07-13 (placement initial interactif dans le web — Q6 tranchée)**
 
 ---
 
@@ -28,7 +28,8 @@
   → `web/engine.js`/`.wasm`, artefacts non versionnés) et piloté par une UI web (`web/play.html` + `web/game.js`,
   plateau hexagonal SVG cliquable, hotseat 2–4). Le workflow Pages installe Emscripten et build le WASM avant déploiement.
   Validé end-to-end (Playwright/Chromium) : 19 hexagones, 72 arêtes, lancer + production OK, zéro erreur console.
-  Suite : Phase 2 (trading, Signal, Margin Call…) et/ou Q5 (identité mécanique).
+  **EN LIGNE** : https://pretoninho.github.io/jeux-de-plateau-crypto/play.html (run Pages #5 vert, WASM buildé en CI ;
+  assets 200 + `application/wasm` vérifiés par curl). Suite : Phase 2 (trading, Signal, Margin Call…) et/ou Q5.
 - Repo contient aussi : `README.md`, `docs/spec.md`, `docs/MEMORY.md`, `docs/TASKS.md`, `CLAUDE.md`, hook SessionStart,
   site vitrine `web/` + workflow de déploiement GitHub Pages (`.github/workflows/pages.yml`), `.gitignore`.
 - **Choix de modélisation T1 (implémente D3)** : représentation 100 % entière, sans flottant — une intersection = clé
@@ -52,7 +53,7 @@
 | D4 | État borné → **tableaux à taille fixe**, pas d'allocation dynamique dans la boucle de tour | 19 cases, ≤ 4 joueurs. |
 | D5 | RNG : **seed configurable en argument CLI** (runs reproductibles) | `rand()` pour commencer, isolé dans `roll_2d6()`. |
 | D6 | **Frontend web sur GitHub Pages** ; moteur C compilé en **WebAssembly (Emscripten)** pour la version jouable | Rend D2 encore plus critique : le moteur DOIT rester pur/sans I/O pour être embarquable en WASM. Interface terminal et interface web partagent le même moteur. |
-| D10 | **Placement initial gratuit** de `INITIAL_POSITIONS`=2 Positions/joueur (`game_place_initial`) pour amorcer la production | Sans amorçage, personne ne produit → personne ne peut construire (blocage). Placement auto réparti pour l'instant ; **choix interactif du placement = point ouvert** (cf. §5 Q6). Convention classique du genre. |
+| D10 | **Placement initial gratuit** de `INITIAL_POSITIONS`=2 Positions/joueur pour amorcer la production | Sans amorçage, personne ne produit → blocage. Deux voies : **interactif** (web, mise en place en serpentin via `place_position_free`) et **auto** (`game_place_initial`, pour sim/démo/terminal). Primitive commune : `place_position_free` / `can_place_position_free` (build.c). |
 | D7 | **Génération de plateau aléatoire seedée** dès le départ (pas de mode « layout fixe » séparé) | `--seed` rend chaque partie reproductible → tests déterministes ET spec respectée. Tranche Q1. |
 | D8 | **Desk (ville) inclus dès la Phase 1** | Déjà dans le périmètre spec (coût 2 Stables + 3 BTC), upgrade d'une Position. Boucle de jeu complète. Tranche Q2. |
 | D9 | **Moteur générique 2–4 joueurs** dès le début (tableaux dimensionnés à 4) ; valider d'abord à 2, puis l'adjacence à 3–4 | Évite un refactor ultérieur. Tranche Q3. |
@@ -89,7 +90,7 @@
 | Q3 | Nombre de joueurs cible pour la 1re version ? | ✅ tranchée → **générique 2–4, test à 2** (D9) |
 | Q4 | Nom de projet définitif ? | ⏸️ **reportée** — identifiants C neutres en attendant ; à trancher plus tard |
 | Q5 | **Identité mécanique propre** : quel(s) mécanisme(s)/expression pour que le jeu ne soit pas un calque trait pour trait de son inspiration ? | ⬜ **ouvert** — à mûrir (pistes ci-dessous) |
-| Q6 | **Placement initial** : automatique réparti (actuel) ou choix interactif par les joueurs (règle standard du genre) ? | ⬜ **ouvert** — auto suffit pour la boucle ; interactif = confort de jeu |
+| Q6 | **Placement initial** : automatique ou choix interactif par les joueurs ? | ✅ tranchée → **interactif dans le web** (mise en place en serpentin) ; le placement **auto** (`game_place_initial`) reste pour la sim/démo/terminal |
 
 ### Pistes pour Q5 — identité mécanique propre (brainstorm, RIEN de tranché)
 
@@ -193,3 +194,10 @@ Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protèg
   vitrine. Workflow Pages : installe Emscripten et build le WASM avant l'upload (paths élargis à `src/`+`Makefile`).
   Validé E2E avec Playwright/Chromium (serveur local) : 19 hexagones, 72 arêtes, 6 positions initiales, lancer 2d6 +
   production, aucune erreur console. Aucune règle en JS : tout passe par l'API WASM (D2 tient jusque dans le navigateur).
+- **2026-07-13** — **Placement initial interactif (Q6 tranchée).** Retour utilisateur : les Positions de départ ne
+  devraient pas être auto-choisies. Refactor `build.{h,c}` : extraction de `can_place_position_free` /
+  `place_position_free` (placement libre, sans coût) ; `can_build_position` et `game_place_initial` réutilisent la
+  primitive. `wasm_api.c` : `wasm_new_game` ne place plus rien ; ajout de `wasm_place_free`/`wasm_can_place_free`/
+  `wasm_initial_positions`. `web/game.js` : **phase de mise en place en serpentin** (chaque joueur place ses 2
+  Positions en cliquant ; lancer désactivé tant que non terminée). Auto (`game_place_initial`) conservé pour
+  sim/démo/terminal. Validé E2E : 6 placements interactifs → passage en jeu, zéro erreur console. 7 suites natives OK.

@@ -37,6 +37,11 @@ BuildResult can_build_line(const GameState *g, int player, int edge);
 BuildResult can_build_position(const GameState *g, int player, int vertex);
 BuildResult can_build_desk(const GameState *g, int player, int vertex);
 
+/* Placement initial gratuit (mise en place) : valide l'emplacement (libre +
+ * règle de distance) sans exiger de ressources. */
+BuildResult can_place_position_free(const GameState *g, int player, int vertex);
+BuildResult place_position_free(GameState *g, int player, int vertex);
+
 /* Construction : débite et pose si valide, sinon aucun effet.
  * Met à jour les points de victoire (Position +1, upgrade Desk +1). */
 BuildResult build_line(GameState *g, int player, int edge);

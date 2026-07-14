@@ -74,7 +74,7 @@
   </header>
 
   <div class="turnbar">
-    <span class="who">Tour de <span class="dot" id="curdot"></span><span id="curname">J1</span></span>
+    <span class="who" id="who"></span>
     <button id="roll" class="primary">🎲 Lancer</button>
     <span class="dice" id="dice"><small>lancez les dés</small></span>
     <button id="end">Fin du tour</button>
@@ -84,7 +84,7 @@
   <div class="layout">
     <div class="board">
       <svg id="board" viewBox="0 0 100 100" aria-label="plateau"></svg>
-      <p class="hint">Cliquez une <b>intersection</b> pour poser une Position (puis un Desk sur la vôtre), une <b>arête</b> pour une Ligne. Les emplacements finançables clignotent en vert.</p>
+      <p class="hint"><b>Mise en place</b> : chaque joueur place ses Positions de départ (intersections vertes), à tour de rôle. Ensuite : cliquez une <b>intersection</b> pour une Position (puis un Desk sur la vôtre), une <b>arête</b> pour une Ligne. Les emplacements possibles clignotent en vert.</p>
     </div>
     <aside>
       <div id="panels"></div>

@@ -26,16 +26,26 @@ static double py_of(Cube c) { return 1.7320508075688772 * ((double)c.z + (double
 
 /* --- cycle de vie -------------------------------------------------------- */
 
+/* Démarre une partie SANS placement initial : la mise en place (choix des
+ * Positions de départ) est pilotée par l'UI via wasm_place_free (phase setup). */
 EMSCRIPTEN_KEEPALIVE
 void wasm_new_game(int players, unsigned int seed) {
     if (players < 2) players = 2;
     if (players > MAX_PLAYERS) players = MAX_PLAYERS;
     game_init(&G, players, seed);
-    game_place_initial(&G, INITIAL_POSITIONS);
 }
 
-EMSCRIPTEN_KEEPALIVE int wasm_n_players(void) { return G.n_players; }
-EMSCRIPTEN_KEEPALIVE int wasm_current(void)   { return G.current; }
+EMSCRIPTEN_KEEPALIVE int wasm_n_players(void)        { return G.n_players; }
+EMSCRIPTEN_KEEPALIVE int wasm_current(void)          { return G.current; }
+EMSCRIPTEN_KEEPALIVE int wasm_initial_positions(void){ return INITIAL_POSITIONS; }
+
+/* Placement initial gratuit (mise en place), piloté par joueur explicite. */
+EMSCRIPTEN_KEEPALIVE int wasm_place_free(int player, int vertex) {
+    return (int)place_position_free(&G, player, vertex);
+}
+EMSCRIPTEN_KEEPALIVE int wasm_can_place_free(int player, int vertex) {
+    return (int)can_place_position_free(&G, player, vertex);
+}
 
 /* --- géométrie & état du plateau ----------------------------------------- */
 

@@ -50,7 +50,9 @@ static int line_connected(const GameState *g, int player, int edge) {
 
 /* --- validation ----------------------------------------------------------- */
 
-BuildResult can_build_position(const GameState *g, int player, int vertex) {
+/* Validité d'emplacement d'une Position, hors coût (libre + règle de distance).
+ * Sert au placement initial gratuit et de socle à can_build_position. */
+BuildResult can_place_position_free(const GameState *g, int player, int vertex) {
     if (!valid_player(g, player)) return BUILD_ERR_PLAYER;
     if (vertex < 0 || vertex >= g->board.n_vertices) return BUILD_ERR_BOUNDS;
     if (g->vertex_building[vertex] != BUILD_NONE) return BUILD_ERR_OCCUPIED;
@@ -60,6 +62,12 @@ BuildResult can_build_position(const GameState *g, int player, int vertex) {
     for (int k = 0; k < vt->n_adj; k++) {
         if (g->vertex_building[vt->adj[k]] != BUILD_NONE) return BUILD_ERR_ADJACENT;
     }
+    return BUILD_OK;
+}
+
+BuildResult can_build_position(const GameState *g, int player, int vertex) {
+    BuildResult r = can_place_position_free(g, player, vertex);
+    if (r != BUILD_OK) return r;
     if (!has_resources(&g->players[player], COST_POSITION)) return BUILD_ERR_COST;
     return BUILD_OK;
 }
@@ -83,6 +91,16 @@ BuildResult can_build_line(const GameState *g, int player, int edge) {
 }
 
 /* --- construction --------------------------------------------------------- */
+
+BuildResult place_position_free(GameState *g, int player, int vertex) {
+    BuildResult r = can_place_position_free(g, player, vertex);
+    if (r != BUILD_OK) return r;
+
+    g->vertex_building[vertex] = BUILD_POSITION;   /* gratuit : aucun débit */
+    g->vertex_owner[vertex] = player;
+    g->players[player].victory_points += 1;
+    return BUILD_OK;
+}
 
 BuildResult build_position(GameState *g, int player, int vertex) {
     BuildResult r = can_build_position(g, player, vertex);
