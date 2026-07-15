@@ -25,7 +25,7 @@ static void give(GameState *g, int p, int amount) {
 
 int main(void) {
     GameState g;
-    game_init(&g, 4, 42u);
+    game_init(&g, 4, 42u, 42u);
 
     /* Scénario : p0 = 2 Positions dont 1 upgradée en Desk ; p1 = 1 Position. */
     int a = place_one(&g, 0);
@@ -53,7 +53,7 @@ int main(void) {
 
     /* Égalité → plus petit indice. Constructions posées directement. */
     GameState h;
-    game_init(&h, 2, 1u);
+    game_init(&h, 2, 1u, 1u);
     int v0 = 0;
     const Vertex *V0 = &h.board.vertices[v0];
     int far = -1;
@@ -71,7 +71,7 @@ int main(void) {
 
     /* Le moteur ne bloque pas au-delà de 10 : score simplement cumulable. */
     GameState big;
-    game_init(&big, 2, 2u);
+    game_init(&big, 2, 2u, 2u);
     int placed = 0;
     for (int v = 0; v < big.board.n_vertices && placed < 12; v++) {
         if (place_position_free(&big, 0, v) == BUILD_OK) placed++;

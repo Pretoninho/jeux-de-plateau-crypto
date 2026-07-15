@@ -66,7 +66,7 @@ int main(void) {
 
     /* 2) Production recoupée par le calcul dual, pour chaque somme. */
     GameState g;
-    game_init(&g, 4, 42u);
+    game_init(&g, 4, 42u, 42u);
     place_fixture(&g);
     for (int roll = 2; roll <= 12; roll++) {
         zero_resources(&g);
@@ -89,7 +89,7 @@ int main(void) {
 
     /* 4) Desk = 2 × Position : mêmes adjacences, production exactement doublée. */
     GameState h;
-    game_init(&h, 2, 7u);
+    game_init(&h, 2, 7u, 7u);
     const int V = 12;
     long total_pos = 0, total_desk = 0;
     h.vertex_owner[V] = 0;
@@ -109,8 +109,8 @@ int main(void) {
 
     /* 5) Reproductibilité + simulation par lots (DoD) : 2000 tours, sans crash. */
     GameState a, b2;
-    game_init(&a, 4, 555u);
-    game_init(&b2, 4, 555u);
+    game_init(&a, 4, 555u, 555u);
+    game_init(&b2, 4, 555u, 555u);
     place_fixture(&a);
     place_fixture(&b2);
     for (int turn = 0; turn < 2000; turn++) {

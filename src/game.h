@@ -21,8 +21,10 @@ typedef struct {
     Player players[MAX_PLAYERS];
     int    n_players;
     int    current;             /* index du joueur actif */
-    unsigned int seed;          /* graine RNG (D5) */
-    Rng    rng;                 /* état du générateur (génération, puis dés) */
+    unsigned int seed;          /* graine du PLATEAU (reproductible) */
+    unsigned int dice_seed;     /* graine des DÉS (flux indépendant, non scripté) */
+    Rng    rng;                 /* flux RNG des DÉS uniquement (la génération du
+                                 * plateau utilise un flux local, jetable) */
 
     /* Occupation du plateau. */
     Building vertex_building[MAX_VERTICES];  /* NONE / POSITION / DESK */
@@ -31,8 +33,16 @@ typedef struct {
 } GameState;
 
 /* Initialise une partie : plateau construit, joueurs et plateau vierges.
- * n_players attendu dans [2, MAX_PLAYERS] (D9). */
-void game_init(GameState *g, int n_players, unsigned int seed);
+ * n_players attendu dans [2, MAX_PLAYERS] (D9).
+ *
+ * DEUX graines indépendantes (la génération du plateau ne script PAS la partie) :
+ *   - board_seed : détermine le plateau (reproductible) ;
+ *   - dice_seed  : détermine les dés, sur un flux séparé.
+ * En vraie partie, l'appelant passe une dice_seed issue d'entropie (partie NON
+ * scriptée) ; en test/simulation, une valeur fixe (reproductible). Le moteur
+ * reste pur : il ne lit aucune source d'entropie lui-même. */
+void game_init(GameState *g, int n_players,
+               unsigned int board_seed, unsigned int dice_seed);
 
 /* Mise en place : pose `per_player` Positions gratuites par joueur (respecte la
  * règle de distance, ignore le coût), pour amorcer la production. À appeler

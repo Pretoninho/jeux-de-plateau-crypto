@@ -34,7 +34,7 @@ static void snapshot(const Player *pl, int out[RES_COUNT]) {
 
 int main(void) {
     GameState g;
-    game_init(&g, 4, 42u);
+    game_init(&g, 4, 42u, 42u);
     const Board *b = &g.board;
 
     const int P = 0, Q = 1;

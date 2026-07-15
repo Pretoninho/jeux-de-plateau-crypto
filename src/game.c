@@ -6,18 +6,25 @@
 #include <assert.h>
 #include <string.h>
 
-void game_init(GameState *g, int n_players, unsigned int seed) {
+void game_init(GameState *g, int n_players,
+               unsigned int board_seed, unsigned int dice_seed) {
     assert(n_players >= 2 && n_players <= MAX_PLAYERS);
 
     memset(g, 0, sizeof(*g));
     g->n_players = n_players;
     g->current = 0;
-    g->seed = seed;
-    rng_seed(&g->rng, seed);
+    g->seed = board_seed;
+    g->dice_seed = dice_seed;
 
-    /* Topologie (T1) puis génération ressources/jetons (T2), même flux RNG. */
+    /* Génération du plateau sur un flux LOCAL, jetable : elle ne touche pas au
+     * flux des dés (la production du plateau ne script pas la partie). */
+    Rng board_rng;
+    rng_seed(&board_rng, board_seed);
     board_build(&g->board);
-    board_generate(&g->board, &g->rng);
+    board_generate(&g->board, &board_rng);
+
+    /* Flux des dés : indépendant, seedé séparément. */
+    rng_seed(&g->rng, dice_seed);
 
     for (int i = 0; i < MAX_VERTICES; i++) {
         g->vertex_building[i] = BUILD_NONE;

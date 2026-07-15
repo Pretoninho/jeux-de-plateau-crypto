@@ -57,14 +57,14 @@ int main(void) {
     /* 2) Robustesse : la distribution tient pour de nombreuses graines. */
     for (unsigned int s = 0; s < 300u; s++) {
         GameState g;
-        game_init(&g, 3, s);
+        game_init(&g, 3, s, s);
         check_distribution(&g.board);
     }
 
     /* 3) Reproductibilité : même graine → plateau identique. */
     GameState a, b;
-    game_init(&a, 4, 999u);
-    game_init(&b, 4, 999u);
+    game_init(&a, 4, 999u, 999u);
+    game_init(&b, 4, 999u, 999u);
     for (int i = 0; i < MAX_TILES; i++) {
         assert(a.board.tiles[i].resource == b.board.tiles[i].resource);
         assert(a.board.tiles[i].number   == b.board.tiles[i].number);
@@ -72,7 +72,7 @@ int main(void) {
 
     /* 4) La graine a un effet : deux graines distinctes diffèrent. */
     GameState c;
-    game_init(&c, 4, 1000u);
+    game_init(&c, 4, 1000u, 1000u);
     int differ = 0;
     for (int i = 0; i < MAX_TILES; i++) {
         if (a.board.tiles[i].resource != c.board.tiles[i].resource ||

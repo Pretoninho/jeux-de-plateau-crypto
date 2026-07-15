@@ -91,7 +91,7 @@ int main(void) {
 
     /* Initialisation d'une partie : plateau vierge. */
     GameState g;
-    game_init(&g, 4, 12345u);
+    game_init(&g, 4, 12345u, 12345u);
     assert(g.n_players == 4);
     assert(g.board.n_tiles == 19);
     for (int i = 0; i < MAX_VERTICES; i++) {
