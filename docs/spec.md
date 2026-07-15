@@ -31,19 +31,19 @@ Reskin crypto d’un jeu à mécaniques Catan (hexagones, dés, production, cons
 
 19 hexagones : 18 cases ressource + 1 case Rekt (ne produit jamais rien, point de départ de Margin Call).
 
-Distribution des cases ressource (validée empiriquement, cf. `territoire_sol_risk.c`) :
+Distribution des cases ressource (**révisée au playtest, 2026-07-14** ; à l’origine BTC 7 / SOL 1) :
 
 |Actif      |Cases|
 |-----------|-----|
-|BTC        |7    |
+|BTC        |6    |
 |Alts       |4    |
 |ETH        |3    |
 |Stablecoins|3    |
-|SOL        |1    |
+|SOL        |2    |
 
 Jetons numériques (18, assignés aléatoirement aux 18 cases ressource) : `2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12`. Le 7 n’est jamais un jeton de case — c’est le seuil qui déclenche Margin Call.
 
-⚠️ **Connu et accepté pour la Phase 1** : SOL n’ayant qu’une case, ~6,8% des parties simulées ont zéro production de SOL sur toute la partie. Ce n’est pas un bug — c’est la distribution volontairement choisie pour refléter la dominance de marché réelle (pondération √dominance). À rouvrir seulement si le playtest confirme que c’est frustrant plutôt qu’intéressant.
+⚠️ **Rareté de SOL — rééquilibrée au playtest (2026-07-14).** À l’origine SOL n’avait qu’**une** case ; comme SOL est exigé par la Ligne *et* la Position, ~27 % des parties simulées ne produisaient jamais de SOL et ne pouvaient donc construire ni Ligne ni Position (le playtest a confirmé la frustration). SOL est passé à **2 cases** (BTC 7→6) : le taux de parties sans SOL retombe à ~7 %, tout en gardant SOL nettement le plus rare (dominance de marché préservée). Les coûts sont inchangés.
 
 ### Coûts de construction
 

@@ -29,12 +29,12 @@ static void check_distribution(const Board *b) {
         }
     }
 
-    /* Distribution des actifs (cf. spec). */
-    assert(res[RES_BTC]    == 7);
+    /* Distribution des actifs (révisée au playtest : BTC 6 / SOL 2). */
+    assert(res[RES_BTC]    == 6);
     assert(res[RES_ALT]    == 4);
     assert(res[RES_ETH]    == 3);
     assert(res[RES_STABLE] == 3);
-    assert(res[RES_SOL]    == 1);
+    assert(res[RES_SOL]    == 2);
     assert(res[RES_NONE]   == 1);
     assert(rekt == 1);
 

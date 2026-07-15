@@ -4,7 +4,7 @@
 > et à mettre à jour dès qu'une décision est prise, qu'un état change, ou qu'une
 > question ouverte est tranchée. Voir le protocole dans [`../CLAUDE.md`](../CLAUDE.md).
 >
-> **Dernière mise à jour : 2026-07-13 (placement initial interactif dans le web — Q6 tranchée)**
+> **Dernière mise à jour : 2026-07-14 (rééquilibrage — SOL 1→2, BTC 7→6)**
 
 ---
 
@@ -112,11 +112,11 @@ Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protèg
 
 ## 6. Points connus & acceptés (ne pas rouvrir sans raison)
 
-- **SOL n'a qu'une case** → parties sans production de SOL. Ce n'est **pas un bug** : distribution volontaire
-  (pondération √dominance). À rouvrir seulement si le playtest confirme la frustration.
-  *Mesure de notre `sim` (2026-07-12, 1000 parties, 4 joueurs, 2 pos. init., 80 tours, bot) : **~26 %** de parties
-  sans SOL — vs ~6,8 % cité par la spec (modèle `territoire_sol_risk.c` différent). Production par tuile homogène
-  (~8–9/tuile/partie tous actifs confondus) : l'écart vient de la **couverture** du plateau, pas d'un défaut de prod.*
+- **Rareté de SOL — RÉÉQUILIBRÉE (2026-07-14).** SOL n'avait qu'1 case et gèle la boucle (exigé par Ligne ET
+  Position) → `sim` mesurait **~27 %** de parties sans aucune production de SOL (celles-ci ne pouvaient construire
+  ni Ligne ni Position). Retour utilisateur : « la rareté de SOL déséquilibre le jeu ». Décision : **SOL 1→2, BTC 7→6**
+  (distribution, coûts inchangés). Mesuré à la `sim` (3000 parties) : sans-SOL **27 %→7 %** (≈ cible ~6,8 % de la spec),
+  score moyen 3,00→3,08 ; SOL reste le plus rare (prod 16,5/partie vs ~30–54). SOL=3 écarté (SOL trop banal, ~1 %).
 - **Somme = 7** en Phase 1 : Margin Call hors scope → traiter comme un tour sans effet (pas de production, pas de vol).
 - **Condition de victoire** : ne pas bloquer le moteur sur l'atteinte de 10 points en Phase 1 (pas de trading).
   Logger le score à chaque tour ; condition réelle à valider en Phase 2.
@@ -126,7 +126,8 @@ Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protèg
 
 ## 7. Données de référence (extraites de la spec — pour rappel rapide)
 
-- **Distribution ressources** : BTC 7 · Alts 4 · ETH 3 · Stablecoins 3 · SOL 1 (+ 1 case Rekt) = 19.
+- **Distribution ressources** (révisée au playtest 2026-07-14) : BTC 6 · Alts 4 · ETH 3 · Stablecoins 3 · SOL 2
+  (+ 1 case Rekt) = 19. *(à l'origine BTC 7 / SOL 1 ; SOL passé à 2 pour l'équilibre — voir §6 et §8.)*
 - **Jetons** : `2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12` (18 jetons ; jamais de 7).
 - **Coûts** : Ligne = 1 SOL + 1 ETH · Position = 1 SOL + 1 ETH + 1 Stable + 1 Alt · Desk = 2 Stable + 3 BTC.
 - **Production** : Position adjacente = 1 unité ; Desk adjacent = 2 unités.
@@ -194,6 +195,11 @@ Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protèg
   vitrine. Workflow Pages : installe Emscripten et build le WASM avant l'upload (paths élargis à `src/`+`Makefile`).
   Validé E2E avec Playwright/Chromium (serveur local) : 19 hexagones, 72 arêtes, 6 positions initiales, lancer 2d6 +
   production, aucune erreur console. Aucune règle en JS : tout passe par l'API WASM (D2 tient jusque dans le navigateur).
+- **2026-07-14** — **Rééquilibrage de la rareté de SOL** (retour utilisateur : SOL déséquilibre le jeu). Diagnostic :
+  SOL (1 case) exigé par Ligne ET Position → boucle goulottée sur la ressource la plus rare ; `sim` = ~27 % de parties
+  sans SOL. Décision (après mesure des variantes à la `sim`) : **distribution SOL 1→2, BTC 7→6** (`setup.c`), coûts
+  inchangés. Résultat : sans-SOL 27 %→~7 %, SOL reste le plus rare. Docs/pages/tests alignés (test_setup : BTC 6/SOL 2 ;
+  test_ui robustifié multi-graines). `spec.md` : table de distribution + note SOL révisées (playtest). 7 suites OK, zéro warning.
 - **2026-07-13** — **Placement initial interactif (Q6 tranchée).** Retour utilisateur : les Positions de départ ne
   devraient pas être auto-choisies. Refactor `build.{h,c}` : extraction de `can_place_position_free` /
   `place_position_free` (placement libre, sans coût) ; `can_build_position` et `game_place_initial` réutilisent la

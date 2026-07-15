@@ -14,7 +14,7 @@ Signal, Margin Call…).
 ## Le jeu en bref
 
 - **Plateau** : 19 hexagones (18 cases ressource + 1 case Rekt), jetons numériques assignés aléatoirement.
-- **Ressources** : BTC (7 cases), Alts (4), ETH (3), Stablecoins (3), SOL (1).
+- **Ressources** : BTC (6 cases), Alts (4), ETH (3), Stablecoins (3), SOL (2). *(SOL 1→2 au playtest, cf. MEMORY.)*
 - **Boucle de tour** : lancer `2d6` → production → construction.
 - **Constructions** : Ligne (route), Position (colonie), Desk (ville).
 - **Mode** : hotseat local, 2 à 4 joueurs, terminal uniquement (pas de graphismes en Phase 1).
