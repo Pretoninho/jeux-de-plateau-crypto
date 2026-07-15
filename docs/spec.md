@@ -86,7 +86,7 @@ Position = 1 point, Desk = 2 points. Cible standard = 10, mais en Phase 1 — sa
 - Séparation stricte moteur de règles (logique pure, sans I/O) / interface terminal — même principe que `territoire_sol_risk.c` : le moteur doit rester testable et simulable sans aucun affichage. C’est cette frontière qui rend tout le reste ci-dessous déférable sans risque.
 - Modélisation du plateau : coordonnées axiales/cube pour les hexagones (standard, bien documenté), plus une représentation des intersections (Positions/Desks) et des arêtes (Lignes). C’est le vrai point dur du projet — à concevoir avant d’écrire la boucle de jeu, pas après.
 - État de jeu petit et borné (19 cases, ≤4 joueurs) → tableaux à taille fixe, pas d’allocation dynamique dans la boucle de tour.
-- RNG : seed configurable en argument CLI, pour des runs reproductibles en test.
+- RNG : **deux flux indépendants** (révision 2026-07-14) — une graine pour le *plateau* (reproductible) et une pour les *dés*. La génération du plateau ne script pas la partie. En vraie partie les dés sont issus d'entropie (partie non scriptée) ; en test/simulation, graine fixe pour des runs reproductibles.
 
 **Volontairement non tranché — peu coûteux à décider plus tard, précisément grâce à la séparation ci-dessus :**
 

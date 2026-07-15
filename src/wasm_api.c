@@ -28,11 +28,14 @@ static double py_of(Cube c) { return 1.7320508075688772 * ((double)c.z + (double
 
 /* Démarre une partie SANS placement initial : la mise en place (choix des
  * Positions de départ) est pilotée par l'UI via wasm_place_free (phase setup). */
+/* board_seed : plateau (reproductible depuis la « graine » saisie).
+ * dice_seed  : dés, flux indépendant. Le JS y passe de l'entropie
+ * (crypto.getRandomValues) → la partie n'est PAS scriptée. */
 EMSCRIPTEN_KEEPALIVE
-void wasm_new_game(int players, unsigned int seed) {
+void wasm_new_game(int players, unsigned int board_seed, unsigned int dice_seed) {
     if (players < 2) players = 2;
     if (players > MAX_PLAYERS) players = MAX_PLAYERS;
-    game_init(&G, players, seed);
+    game_init(&G, players, board_seed, dice_seed);
 }
 
 EMSCRIPTEN_KEEPALIVE int wasm_n_players(void)        { return G.n_players; }

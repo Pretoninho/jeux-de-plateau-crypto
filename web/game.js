@@ -25,7 +25,7 @@ const S = 46, PAD = 30;  // échelle pixel, marge
 
 function wrapAll() {
   const sig = {
-    wasm_new_game: [null, ["number", "number"]],
+    wasm_new_game: [null, ["number", "number", "number"]],
     wasm_n_players: ["number", []], wasm_current: ["number", []],
     wasm_initial_positions: ["number", []],
     wasm_place_free: ["number", ["number", "number"]],
@@ -216,7 +216,10 @@ function onEdgeClick(e) {
 function newGame() {
   const players = parseInt(document.getElementById("players").value, 10);
   const seed = (parseInt(document.getElementById("seed").value, 10) || 0) >>> 0;
-  F.wasm_new_game(players, seed);
+  // Graine des dés = entropie → la partie n'est PAS scriptée (le plateau, lui,
+  // reste reproductible depuis la graine saisie). Flux RNG séparés côté moteur.
+  const diceSeed = (crypto.getRandomValues(new Uint32Array(1))[0]) >>> 0;
+  F.wasm_new_game(players, seed, diceSeed);
   const rounds = F.wasm_initial_positions();
   setup = { active: true, queue: buildSetupQueue(players, rounds), idx: 0 };
   rolled = false;

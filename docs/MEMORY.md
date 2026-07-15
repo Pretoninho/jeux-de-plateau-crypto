@@ -4,7 +4,7 @@
 > et à mettre à jour dès qu'une décision est prise, qu'un état change, ou qu'une
 > question ouverte est tranchée. Voir le protocole dans [`../CLAUDE.md`](../CLAUDE.md).
 >
-> **Dernière mise à jour : 2026-07-14 (règle A — Position reliée à une Ligne ; B à venir)**
+> **Dernière mise à jour : 2026-07-14 (RNG : flux plateau/dés séparés ; partie non scriptée)**
 
 ---
 
@@ -51,7 +51,7 @@
 | D2 | Séparation stricte **moteur (logique pure, sans I/O)** / interface terminal | Frontière qui rend tout le reste déférable. Modèle : `territoire_sol_risk.c`. |
 | D3 | Plateau en **coordonnées axiales/cube** + représentation explicite des intersections (Positions/Desks) et des arêtes (Lignes) | Le vrai point dur — à concevoir avant la boucle de jeu. |
 | D4 | État borné → **tableaux à taille fixe**, pas d'allocation dynamique dans la boucle de tour | 19 cases, ≤ 4 joueurs. |
-| D5 | RNG : **seed configurable en argument CLI** (runs reproductibles) | `rand()` pour commencer, isolé dans `roll_2d6()`. |
+| D5 | RNG : **deux flux indépendants** — `board_seed` (plateau, reproductible) et `dice_seed` (dés, flux séparé). La génération du plateau NE script PAS les dés (flux local jetable). En vraie partie, `dice_seed` = **entropie** (terminal `time^clock^&pile`, web `crypto`) → partie **non scriptée** ; en test/sim, graine fixe → reproductible. `game_init(g, n, board_seed, dice_seed)`. |
 | D6 | **Frontend web sur GitHub Pages** ; moteur C compilé en **WebAssembly (Emscripten)** pour la version jouable | Rend D2 encore plus critique : le moteur DOIT rester pur/sans I/O pour être embarquable en WASM. Interface terminal et interface web partagent le même moteur. |
 | D10 | **Placement initial gratuit** de `INITIAL_POSITIONS`=2 Positions/joueur pour amorcer la production | Sans amorçage, personne ne produit → blocage. Deux voies : **interactif** (web, mise en place en serpentin via `place_position_free`) et **auto** (`game_place_initial`, pour sim/démo/terminal). Primitive commune : `place_position_free` / `can_place_position_free` (build.c). |
 | D7 | **Génération de plateau aléatoire seedée** dès le départ (pas de mode « layout fixe » séparé) | `--seed` rend chaque partie reproductible → tests déterministes ET spec respectée. Tranche Q1. |
@@ -201,6 +201,13 @@ Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protèg
   sans SOL. Décision (après mesure des variantes à la `sim`) : **distribution SOL 1→2, BTC 7→6** (`setup.c`), coûts
   inchangés. Résultat : sans-SOL 27 %→~7 %, SOL reste le plus rare. Docs/pages/tests alignés (test_setup : BTC 6/SOL 2 ;
   test_ui robustifié multi-graines). `spec.md` : table de distribution + note SOL révisées (playtest). 7 suites OK, zéro warning.
+- **2026-07-14** — **RNG : flux plateau/dés séparés (partie non scriptée)** (retour utilisateur : la production du board
+  ne doit pas scripter la partie). Avant : un seul flux `g->rng` seedé, consommé par la génération PUIS par les dés →
+  la graine scriptait plateau + toute la séquence de dés, et la génération décalait les dés. Correctif (`game_init`
+  prend `board_seed` + `dice_seed`) : plateau généré sur un flux LOCAL jetable ; dés sur `g->rng` seedé séparément.
+  Défaut vraie partie = **entropie** (terminal `time^clock^&pile` + option `--dice-seed` ; web `crypto.getRandomValues`)
+  → non scriptée ; test/sim passent une graine fixe → reproductible. Prouvé : même `--seed` → même plateau mais dés
+  différents chaque run ; `--dice-seed` fixe → dés identiques. Tous les appels `game_init` mis à jour. 7 suites OK.
 - **2026-07-14** — **Règle A : Position reliée à une Ligne** (retour utilisateur : « à quoi sert une Ligne ? » — elle
   ne servait à rien). `build.c` : `position_connected` ; `can_build_position` exige désormais une Ligne adjacente du
   joueur (le placement initial `place_position_free` en est exempt). Messages `CONNECT` génériques (ui.c + web).

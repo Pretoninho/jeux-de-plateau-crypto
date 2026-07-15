@@ -71,7 +71,10 @@ void sim_run(SimStats *st, int games, int turns, int n_players,
 
     for (int i = 0; i < games; i++) {
         GameState g;
-        game_init(&g, n_players, base_seed + (unsigned int)i);
+        /* Simulation reproductible : board et dés déterministes (même graine
+         * dérivée), sur deux flux indépendants. */
+        unsigned int s = base_seed + (unsigned int)i;
+        game_init(&g, n_players, s, s);
         game_place_initial(&g, INITIAL_POSITIONS);
 
         long prod[RES_COUNT];

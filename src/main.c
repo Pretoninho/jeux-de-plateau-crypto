@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <stdint.h>
 
 #include "game.h"
 #include "ui.h"
@@ -16,9 +18,11 @@
 
 static void usage(const char *prog, FILE *out) {
     fprintf(out,
-        "Usage : %s [--seed <n>] [--players <2..4>] [--demo <tours>]\n"
-        "               [--sim <parties>] [--turns <n>]\n"
-        "  --seed n      graine RNG, ou graine de base en simulation (defaut 1)\n"
+        "Usage : %s [--seed <n>] [--dice-seed <n>] [--players <2..4>]\n"
+        "               [--demo <tours>] [--sim <parties>] [--turns <n>]\n"
+        "  --seed n      graine du PLATEAU (reproductible ; defaut 1)\n"
+        "  --dice-seed n graine des DES (flux separe). Defaut : aleatoire en\n"
+        "                partie interactive (partie non scriptee), = --seed en demo\n"
         "  --players n   nombre de joueurs 2..4 (defaut 3)\n"
         "  --demo t      partie automatique de t tours puis sortie\n"
         "  --sim g       simulation par lots : g parties, puis rapport agrege\n"
@@ -39,6 +43,8 @@ static int arg_int(int argc, char **argv, int i, int *ok) {
 
 int main(int argc, char **argv) {
     unsigned int seed = 1u;
+    unsigned int dice_seed = 0u;
+    int dice_seed_set = 0;
     int players = 3;
     int demo_turns = -1;   /* < 0 : mode interactif */
     int sim_games = -1;    /* >= 0 : mode simulation */
@@ -52,6 +58,11 @@ int main(int argc, char **argv) {
         } else if (strcmp(argv[i], "--seed") == 0) {
             seed = (unsigned int)arg_int(argc, argv, i, &ok);
             if (!ok) { usage(argv[0], stderr); return 1; }
+            i++;
+        } else if (strcmp(argv[i], "--dice-seed") == 0) {
+            dice_seed = (unsigned int)arg_int(argc, argv, i, &ok);
+            if (!ok) { usage(argv[0], stderr); return 1; }
+            dice_seed_set = 1;
             i++;
         } else if (strcmp(argv[i], "--players") == 0) {
             players = arg_int(argc, argv, i, &ok);
@@ -96,7 +107,22 @@ int main(int argc, char **argv) {
     }
 
     GameState g;
-    game_init(&g, players, seed);
+
+    /* Graine des dés : explicite si fournie ; sinon reproductible en démo
+     * (= graine plateau), mais ALÉATOIRE en partie interactive → non scriptée. */
+    unsigned int effective_dice;
+    if (dice_seed_set) {
+        effective_dice = dice_seed;
+    } else if (demo_turns >= 0) {
+        effective_dice = seed;
+    } else {
+        /* Entropie sans I/O : horloge murale ^ horloge CPU ^ adresse de pile
+         * (varie d'un lancement à l'autre) → dés imprévisibles, partie non scriptée. */
+        effective_dice = (unsigned int)((uintptr_t)&g ^ (uintptr_t)time(NULL)
+                                        ^ (uintptr_t)clock());
+    }
+
+    game_init(&g, players, seed, effective_dice);
     game_place_initial(&g, INITIAL_POSITIONS);   /* amorçage de la production */
 
     if (demo_turns >= 0) {

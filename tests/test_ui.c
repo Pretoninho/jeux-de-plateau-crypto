@@ -35,7 +35,7 @@ static int file_contains(FILE *f, const char *needle) {
 int main(void) {
     /* 1) Rendu du plateau et des scores. */
     GameState g;
-    game_init(&g, 3, 42u);
+    game_init(&g, 3, 42u, 42u);
 
     FILE *fb = tmpfile();
     assert(fb);
@@ -52,7 +52,7 @@ int main(void) {
 
     /* 2) Boucle interactive pilotée par script : une construction réussit. */
     GameState g2;
-    game_init(&g2, 2, 7u);
+    game_init(&g2, 2, 7u, 7u);
     game_place_initial(&g2, INITIAL_POSITIONS);   /* joueur 0 a des Positions */
     for (int k = 0; k < RES_COUNT; k++) g2.players[0].resources[k] = 10;
 
@@ -86,7 +86,7 @@ int main(void) {
 
     /* 3) Commande invalide et hors-bornes : pas de crash, message d'erreur. */
     GameState g3;
-    game_init(&g3, 2, 1u);
+    game_init(&g3, 2, 1u, 1u);
     FILE *in3 = tmpfile();
     fputs("blabla\n", in3);
     fputs("pos 9999\n", in3);   /* hors bornes */
@@ -109,7 +109,7 @@ int main(void) {
     FILE *fd = tmpfile();
     for (unsigned int s = 0; s < 8u; s++) {
         GameState g4;
-        game_init(&g4, 4, s);
+        game_init(&g4, 4, s, s);
         game_place_initial(&g4, INITIAL_POSITIONS);
         ui_demo(&g4, 80, fd);
         int sum = 0;
