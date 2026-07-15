@@ -117,9 +117,13 @@ function renderBoard() {
     const x1 = sx(VX[a]), y1 = sy(VY[a]), x2 = sx(VX[b]), y2 = sy(VY[b]);
     const owner = F.wasm_edge_owner(e);
     const built = owner >= 0;
-    const col = built ? P_COLOR[owner] : undefined;
+    const width = (built ? S * 0.18 : S * 0.13).toFixed(1);
+    // Ligne construite : couleur du propriétaire en style INLINE. Un attribut
+    // stroke="…" serait écrasé par la règle CSS `.edge { stroke }` (en SVG, une
+    // règle CSS bat un attribut de présentation) ; le style inline, lui, gagne.
+    const style = built ? ` style="stroke:${P_COLOR[owner]}"` : "";
     s += `<line data-edge="${e}" class="edge${built ? " built" : ""}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" `
-       + `stroke-width="${(S * 0.13).toFixed(1)}"${col ? ` stroke="${col}"` : ""}/>`;
+       + `stroke-width="${width}"${style}/>`;
   }
   for (let v = 0; v < VX.length; v++) {
     const cx = sx(VX[v]), cy = sy(VY[v]);
