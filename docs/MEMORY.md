@@ -4,7 +4,7 @@
 > et à mettre à jour dès qu'une décision est prise, qu'un état change, ou qu'une
 > question ouverte est tranchée. Voir le protocole dans [`../CLAUDE.md`](../CLAUDE.md).
 >
-> **Dernière mise à jour : 2026-07-14 (RNG : flux plateau/dés séparés ; partie non scriptée)**
+> **Dernière mise à jour : 2026-07-14 (fix UI : couleur des Lignes construites)**
 
 ---
 
@@ -201,6 +201,11 @@ Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protèg
   sans SOL. Décision (après mesure des variantes à la `sim`) : **distribution SOL 1→2, BTC 7→6** (`setup.c`), coûts
   inchangés. Résultat : sans-SOL 27 %→~7 %, SOL reste le plus rare. Docs/pages/tests alignés (test_setup : BTC 6/SOL 2 ;
   test_ui robustifié multi-graines). `spec.md` : table de distribution + note SOL révisées (playtest). 7 suites OK, zéro warning.
+- **2026-07-14** — **Fix UI web : les Lignes construites n'affichaient aucune couleur** (retour utilisateur). Cause :
+  la couleur était posée en *attribut* `stroke="…"`, écrasé par la règle CSS `.edge { stroke }` (en SVG, une règle CSS
+  bat un attribut de présentation). Correctif (`web/game.js`) : couleur du propriétaire en **style inline**
+  (`style="stroke:…"`), qui gagne ; trait construit un peu plus épais. Vérifié E2E (précédence CSS : attribut→gris,
+  inline→couleur). JS seul (moteur/WASM inchangés).
 - **2026-07-14** — **RNG : flux plateau/dés séparés (partie non scriptée)** (retour utilisateur : la production du board
   ne doit pas scripter la partie). Avant : un seul flux `g->rng` seedé, consommé par la génération PUIS par les dés →
   la graine scriptait plateau + toute la séquence de dés, et la génération décalait les dés. Correctif (`game_init`
