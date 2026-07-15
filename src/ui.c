@@ -37,7 +37,7 @@ static const char *build_message(BuildResult r) {
         case BUILD_ERR_BOUNDS:      return "identifiant hors bornes";
         case BUILD_ERR_OCCUPIED:    return "emplacement deja pris";
         case BUILD_ERR_ADJACENT:    return "trop proche d'une autre Position";
-        case BUILD_ERR_CONNECT:     return "Ligne non connectee a votre reseau";
+        case BUILD_ERR_CONNECT:     return "non relie a votre reseau de Lignes";
         case BUILD_ERR_NOT_POSITION:return "pas de Position a vous a upgrader ici";
         case BUILD_ERR_COST:        return "ressources insuffisantes";
         default:                    return "erreur";

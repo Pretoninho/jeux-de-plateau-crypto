@@ -48,6 +48,16 @@ static int line_connected(const GameState *g, int player, int edge) {
     return 0;
 }
 
+/* Une Position construite en cours de partie doit toucher une Ligne du joueur
+ * (règle A). Le placement initial gratuit en est exempt (aucune route au départ). */
+static int position_connected(const GameState *g, int player, int vertex) {
+    const Vertex *vt = &g->board.vertices[vertex];
+    for (int k = 0; k < vt->n_edges; k++) {
+        if (g->edge_owner[vt->edges[k]] == player) return 1;
+    }
+    return 0;
+}
+
 /* --- validation ----------------------------------------------------------- */
 
 /* Validité d'emplacement d'une Position, hors coût (libre + règle de distance).
@@ -68,6 +78,8 @@ BuildResult can_place_position_free(const GameState *g, int player, int vertex) 
 BuildResult can_build_position(const GameState *g, int player, int vertex) {
     BuildResult r = can_place_position_free(g, player, vertex);
     if (r != BUILD_OK) return r;
+    /* Règle A : reliée à une Ligne du joueur (le placement initial est exempt). */
+    if (!position_connected(g, player, vertex)) return BUILD_ERR_CONNECT;
     if (!has_resources(&g->players[player], COST_POSITION)) return BUILD_ERR_COST;
     return BUILD_OK;
 }

@@ -56,7 +56,7 @@ Jetons numériques (18, assignés aléatoirement aux 18 cases ressource) : `2, 3
 1. Le joueur actif lance 2d6.
 1. Si la somme ≠ 7 : chaque case portant ce numéro produit l’actif correspondant pour chaque joueur y ayant une Position (1 unité) ou un Desk (2 unités) adjacent.
 1. Si la somme = 7 : Margin Call — hors scope Phase 1 ; pour l’instant traiter comme un tour sans effet (pas de production, pas de vol).
-1. Le joueur peut construire (Ligne / Position / Desk) s’il a les ressources requises, sous réserve des règles d’adjacence standard Catan (Position : aucune intersection adjacente déjà occupée ; Ligne : connectée à une Ligne ou Position existante du même joueur).
+1. Le joueur peut construire (Ligne / Position / Desk) s’il a les ressources requises, sous réserve des règles d’adjacence standard (Position : aucune intersection adjacente déjà occupée **et** reliée à une Ligne du joueur — sauf les Positions de mise en place, gratuites et exemptes ; Ligne : connectée à une Ligne ou Position existante du même joueur). *(Règle « Position reliée à une Ligne » ajoutée au playtest, 2026-07-14, pour donner un rôle à la Ligne.)*
 1. Tour suivant.
 
 ### Valorisation (points de victoire)

@@ -83,6 +83,15 @@ Légende : ⬜ à faire · 🟡 en cours · ✅ fait
 Validée : 7 suites de test (`make test`), simulation par lots (`make sim`), zéro warning
 (`-Wall -Wextra -Werror -std=c99`). Interface terminal jouable (`crypto-board`).
 
+## Équilibrage & règles avancées (playtest)
+
+- [x] Rééquilibrage rareté SOL (SOL 1→2 / BTC 7→6) — mesuré à la `sim`.
+- [x] **Règle A** — Position construite en jeu **reliée à une Ligne** du joueur (donne un rôle à la Ligne).
+      Placement initial exempt. `position_connected` (build.c).
+- [ ] **Règle B** — **Market Maker** : la plus longue chaîne continue de Lignes d'un joueur rapporte des points
+      (route la plus longue). Calcul de plus long chemin sur le graphe des arêtes + intégration au score. *(à faire)*
+- [ ] (option) Échange banque 4:1 pour fluidifier l'acquisition des ressources (facilite les achats ; plutôt Phase 2).
+
 ## Hors périmètre (Phase 2+)
 
 Trading (Bourse, Courtier) · Signal (cartes développement) + Risk Manager · Margin Call (voleur) ·

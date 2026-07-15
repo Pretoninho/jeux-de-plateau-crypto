@@ -9,7 +9,7 @@ const P_COLOR = ["#ef4444", "#3b82f6", "#22c55e", "#eab308"];
 const P_NAME  = ["J1", "J2", "J3", "J4"];
 const BUILD_MSG = {
   0: "construit ✔", 1: "joueur invalide", 2: "hors bornes", 3: "emplacement occupé",
-  4: "trop proche d'une autre Position", 5: "Ligne non connectée à votre réseau",
+  4: "trop proche d'une autre Position", 5: "non reliée à votre réseau de Lignes",
   6: "pas de Position à vous ici", 7: "ressources insuffisantes",
 };
 

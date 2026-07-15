@@ -9,20 +9,18 @@
 #include "../src/build.h"
 #include "../src/score.h"
 
-static void give(GameState *g, int p, int amount) {
-    for (int k = 0; k < RES_COUNT; k++) g->players[p].resources[k] = amount;
-}
-
-/* Construit une Position sur le premier emplacement valide ; retourne l'id. */
-static int build_one_position(GameState *g, int p) {
-    give(g, p, 10);
+/* Place une Position sur le premier emplacement valide (placement libre, comme
+ * la mise en place) ; retourne l'id, ou -1. Évite la règle A (connexion) : ici
+ * on teste le score, pas la connexité. */
+static int place_one(GameState *g, int p) {
     for (int v = 0; v < g->board.n_vertices; v++) {
-        if (can_build_position(g, p, v) == BUILD_OK) {
-            build_position(g, p, v);
-            return v;
-        }
+        if (place_position_free(g, p, v) == BUILD_OK) return v;
     }
     return -1;
+}
+
+static void give(GameState *g, int p, int amount) {
+    for (int k = 0; k < RES_COUNT; k++) g->players[p].resources[k] = amount;
 }
 
 int main(void) {
@@ -30,13 +28,13 @@ int main(void) {
     game_init(&g, 4, 42u);
 
     /* Scénario : p0 = 2 Positions dont 1 upgradée en Desk ; p1 = 1 Position. */
-    int a = build_one_position(&g, 0);
-    int b = build_one_position(&g, 0);
+    int a = place_one(&g, 0);
+    int b = place_one(&g, 0);
     assert(a >= 0 && b >= 0);
     give(&g, 0, 10);
     assert(build_desk(&g, 0, b) == BUILD_OK);
 
-    int c = build_one_position(&g, 1);
+    int c = place_one(&g, 1);
     assert(c >= 0);
 
     /* Score recalculé depuis le plateau. */
@@ -76,8 +74,7 @@ int main(void) {
     game_init(&big, 2, 2u);
     int placed = 0;
     for (int v = 0; v < big.board.n_vertices && placed < 12; v++) {
-        give(&big, 0, 10);
-        if (build_position(&big, 0, v) == BUILD_OK) placed++;
+        if (place_position_free(&big, 0, v) == BUILD_OK) placed++;
     }
     assert(game_score(&big, 0) == placed);
     assert(placed >= 10);   /* dépasse 10 sans que le moteur s'y oppose */
