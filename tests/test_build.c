@@ -1,7 +1,8 @@
-/* test_build.c — construction & validation (T4).
+/* test_build.c — construction & validation (T4 + règle A).
  *
- * Les ids d'intersections/arêtes sont dérivés de la topologie réelle, pour ne
- * pas dépendre d'une numérotation particulière.
+ * Règle A : une Position construite en jeu doit être reliée à une Ligne du
+ * joueur ; le placement initial gratuit (place_position_free) en est exempt.
+ * Les ids d'intersections/arêtes sont dérivés de la topologie réelle.
  */
 #include <assert.h>
 #include <stdio.h>
@@ -38,7 +39,7 @@ int main(void) {
 
     const int P = 0, Q = 1;
 
-    /* Repères topologiques dérivés du plateau. */
+    /* Repères topologiques. */
     int v0 = 0;
     const Vertex *V0 = &b->vertices[v0];
     int v_adj = V0->adj[0];                 /* voisine de v0 (règle de distance) */
@@ -55,97 +56,90 @@ int main(void) {
     int w = (b->edges[e_inc].v[0] == v0) ? b->edges[e_inc].v[1]
                                          : b->edges[e_inc].v[0];
 
-    /* --- Position --------------------------------------------------------- */
-    give(&g, P, 5);
+    /* --- Mise en place : Position initiale gratuite (exempte de connexion) --- */
     int before[RES_COUNT];
-    snapshot(&g.players[P], before);
-
-    /* can_* ne mute pas. */
-    assert(can_build_position(&g, P, v0) == BUILD_OK);
-    assert(g.vertex_building[v0] == BUILD_NONE);
-
-    assert(build_position(&g, P, v0) == BUILD_OK);
+    assert(place_position_free(&g, P, v0) == BUILD_OK);
     assert(g.vertex_building[v0] == BUILD_POSITION);
     assert(g.vertex_owner[v0] == P);
     assert(g.players[P].victory_points == 1);
-    assert_debit(before, &g.players[P], C_POSITION);
 
-    /* Emplacement déjà pris. */
-    assert(build_position(&g, P, v0) == BUILD_ERR_OCCUPIED);
+    /* --- Position en jeu : distance + connexion --------------------------- */
+    give(&g, P, 5);
 
-    /* Règle de distance : voisine immédiate interdite, sans débit. */
+    /* Règle de distance : voisine immédiate interdite. */
+    assert(can_build_position(&g, P, v_adj) == BUILD_ERR_ADJACENT);
+
+    /* Règle A : loin de v0, distance OK mais AUCUNE Ligne → refus, sans effet. */
     snapshot(&g.players[P], before);
-    assert(build_position(&g, P, v_adj) == BUILD_ERR_ADJACENT);
-    assert(g.vertex_building[v_adj] == BUILD_NONE);
+    assert(can_build_position(&g, P, v_far) == BUILD_ERR_CONNECT);
+    assert(build_position(&g, P, v_far) == BUILD_ERR_CONNECT);
+    assert(g.vertex_building[v_far] == BUILD_NONE);
     assert_debit(before, &g.players[P], (const int[RES_COUNT]){ 0 });
 
-    /* Loin de v0 : autorisé. */
-    assert(build_position(&g, P, v_far) == BUILD_OK);
-    assert(g.players[P].victory_points == 2);
-
-    /* Ressources insuffisantes. */
-    give(&g, Q, 0);
-    int v_free = -1;
-    for (int v = 0; v < b->n_vertices; v++) {
-        if (can_build_position(&g, Q, v) == BUILD_ERR_COST) { v_free = v; break; }
-    }
-    assert(v_free >= 0);   /* un emplacement libre mais impayable existe */
-
     /* --- Ligne ------------------------------------------------------------ */
-    /* Arête loin de tout ouvrage de P (aucune extrémité sur v0 ni v_far). */
+    /* Arête sans lien avec P (aucune extrémité sur v0). */
     int e_far = -1;
     for (int e = 0; e < b->n_edges; e++) {
-        int a = b->edges[e].v[0], c = b->edges[e].v[1];
-        if (a != v0 && c != v0 && a != v_far && c != v_far) { e_far = e; break; }
+        if (b->edges[e].v[0] != v0 && b->edges[e].v[1] != v0) { e_far = e; break; }
     }
     assert(e_far >= 0);
-
-    /* Non connectée. */
     assert(can_build_line(&g, P, e_far) == BUILD_ERR_CONNECT);
 
     /* Connectée via la Position en v0. */
     give(&g, P, 5);
     snapshot(&g.players[P], before);
-    assert(build_line(&g, P, e_inc) == BUILD_OK);
+    assert(build_line(&g, P, e_inc) == BUILD_OK);   /* v0 — w */
     assert(g.edge_owner[e_inc] == P);
     assert_debit(before, &g.players[P], C_LINE);
 
     /* Arête déjà prise. */
     assert(build_line(&g, P, e_inc) == BUILD_ERR_OCCUPIED);
 
-    /* Connexion route→route : arête incidente à w (qui n'a pas d'ouvrage,
-     * mais porte désormais une Ligne de P). */
+    /* Connexion route→route : arête incidente à w (sans ouvrage, mais route de P). */
     const Vertex *W = &b->vertices[w];
     int e_next = -1;
     for (int k = 0; k < W->n_edges; k++) {
         if (W->edges[k] != e_inc) { e_next = W->edges[k]; break; }
     }
     assert(e_next >= 0);
-    assert(can_build_line(&g, P, e_next) == BUILD_OK);
-    assert(build_line(&g, P, e_next) == BUILD_OK);
+    give(&g, P, 5);
+    assert(build_line(&g, P, e_next) == BUILD_OK);   /* w — x */
+
+    /* --- Position reliée au réseau --------------------------------------- */
+    int x = (b->edges[e_next].v[0] == w) ? b->edges[e_next].v[1]
+                                         : b->edges[e_next].v[0];
+    assert(x != v0 && g.vertex_building[x] == BUILD_NONE);
+
+    /* Reliée (arête e_next) et distance OK, mais ressources nulles → COST. */
+    give(&g, P, 0);
+    assert(can_build_position(&g, P, x) == BUILD_ERR_COST);
+
+    /* Avec ressources : construite. */
+    give(&g, P, 5);
+    snapshot(&g.players[P], before);
+    assert(build_position(&g, P, x) == BUILD_OK);
+    assert(g.vertex_building[x] == BUILD_POSITION);
+    assert(g.players[P].victory_points == 2);
+    assert_debit(before, &g.players[P], C_POSITION);
 
     /* --- Desk ------------------------------------------------------------- */
-    /* Desk sur une intersection vide : refusé. */
     int v_empty = -1;
     for (int v = 0; v < b->n_vertices; v++) {
         if (g.vertex_building[v] == BUILD_NONE) { v_empty = v; break; }
     }
     assert(v_empty >= 0);
     give(&g, P, 5);
-    assert(build_desk(&g, P, v_empty) == BUILD_ERR_NOT_POSITION);
+    assert(build_desk(&g, P, v_empty) == BUILD_ERR_NOT_POSITION);   /* vide */
+    assert(build_desk(&g, Q, v0) == BUILD_ERR_PLAYER);              /* pas la sienne */
 
-    /* Desk sur la Position d'un autre joueur : refusé. */
-    assert(build_desk(&g, Q, v0) == BUILD_ERR_PLAYER);
-
-    /* Upgrade de sa propre Position en v0. */
     snapshot(&g.players[P], before);
-    assert(build_desk(&g, P, v0) == BUILD_OK);
+    assert(build_desk(&g, P, v0) == BUILD_OK);                     /* upgrade */
     assert(g.vertex_building[v0] == BUILD_DESK);
     assert(g.vertex_owner[v0] == P);
     assert(g.players[P].victory_points == 3);   /* 2 Positions (2) + upgrade (+1) */
     assert_debit(before, &g.players[P], C_DESK);
 
-    printf("OK construction : Position (distance/cout/occupe), Ligne (connexion),\n");
-    printf("  Desk (upgrade), debits et points de victoire coherents.\n");
+    printf("OK construction : Position (distance/connexion/cout), Ligne,\n");
+    printf("  route->route, Desk (upgrade), debits et points coherents.\n");
     return 0;
 }

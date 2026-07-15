@@ -53,15 +53,25 @@ int main(void) {
     /* 2) Boucle interactive pilotée par script : une construction réussit. */
     GameState g2;
     game_init(&g2, 2, 7u);
+    game_place_initial(&g2, INITIAL_POSITIONS);   /* joueur 0 a des Positions */
     for (int k = 0; k < RES_COUNT; k++) g2.players[0].resources[k] = 10;
+
+    /* Arête reliée à une Position du joueur 0 → Ligne constructible (règle A :
+     * une Ligne est valide si reliée à une construction du joueur). */
+    int p0v = -1;
+    for (int v = 0; v < g2.board.n_vertices; v++) {
+        if (g2.vertex_owner[v] == 0 && g2.vertex_building[v] != BUILD_NONE) { p0v = v; break; }
+    }
+    assert(p0v >= 0);
+    int e0 = g2.board.vertices[p0v].edges[0];
+    char cmd[32];
+    snprintf(cmd, sizeof(cmd), "line %d\n", e0);
 
     FILE *in = tmpfile();
     assert(in);
     fputs("board\n", in);
-    fputs("pos 0\n", in);      /* joueur 0 : intersection 0 libre + payable */
+    fputs(cmd, in);            /* joueur 0 : Ligne reliée à sa Position */
     fputs("score\n", in);
-    fputs("end\n", in);
-    fputs("roll\n", in);       /* joueur 1 lance */
     fputs("quit\n", in);
     rewind(in);
 
@@ -69,9 +79,7 @@ int main(void) {
     assert(out);
     ui_run(&g2, in, out);
 
-    assert(g2.vertex_building[0] == BUILD_POSITION);
-    assert(g2.vertex_owner[0] == 0);
-    assert(g2.players[0].victory_points == 1);
+    assert(g2.edge_owner[e0] == 0);
     assert(file_contains(out, "construit"));
     fclose(in);
     fclose(out);

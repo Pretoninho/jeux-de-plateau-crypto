@@ -5,10 +5,10 @@
  *   - Position (intersection) : 1 SOL + 1 ETH + 1 Stable + 1 Alt
  *   - Desk     (upgrade)      : 2 Stable + 3 BTC
  *
- * Adjacence (règles d'adjacence standard, telles que précisées par la spec) :
- *   - Position : intersection libre ET aucune intersection voisine occupée
- *                (règle de distance). NB : la spec Phase 1 n'exige pas de
- *                connexion routière pour la Position — voir MEMORY (point ouvert).
+ * Adjacence :
+ *   - Position : intersection libre, aucune intersection voisine occupée
+ *                (règle de distance), ET reliée à une Ligne du joueur (règle A).
+ *                Le placement initial gratuit (place_position_free) en est exempt.
  *   - Ligne    : arête libre ET connectée à une Ligne ou une Position/Desk
  *                du même joueur.
  *   - Desk     : upgrade d'une Position existante appartenant au joueur.

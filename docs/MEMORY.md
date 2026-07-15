@@ -4,7 +4,7 @@
 > et à mettre à jour dès qu'une décision est prise, qu'un état change, ou qu'une
 > question ouverte est tranchée. Voir le protocole dans [`../CLAUDE.md`](../CLAUDE.md).
 >
-> **Dernière mise à jour : 2026-07-14 (rééquilibrage — SOL 1→2, BTC 7→6)**
+> **Dernière mise à jour : 2026-07-14 (règle A — Position reliée à une Ligne ; B à venir)**
 
 ---
 
@@ -120,9 +120,10 @@ Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protèg
 - **Somme = 7** en Phase 1 : Margin Call hors scope → traiter comme un tour sans effet (pas de production, pas de vol).
 - **Condition de victoire** : ne pas bloquer le moteur sur l'atteinte de 10 points en Phase 1 (pas de trading).
   Logger le score à chaque tour ; condition réelle à valider en Phase 2.
-- **Position sans connexion routière (T4)** : la spec Phase 1 n'exige, pour une Position, que la *règle de distance*
-  (aucune intersection voisine occupée) — pas de connexion à une Ligne du joueur. Implémenté ainsi. À rouvrir si l'on
-  veut la règle classique complète « colonie reliée à une route » (placement libre facilite les tests de la boucle).
+- **Connexion routière des Positions — ACTIVÉE (règle A, 2026-07-14).** Une Position construite en jeu doit être
+  reliée à une Ligne du joueur (`position_connected`, `build.c`), en plus de la règle de distance. Le **placement
+  initial** (`place_position_free`) en reste **exempt**. But : donner un rôle à la Ligne (sans elle, aucune expansion).
+  Récompense de la Ligne (route la plus longue = *Market Maker*) = **règle B, à venir** (voir §5/TASKS).
 
 ## 7. Données de référence (extraites de la spec — pour rappel rapide)
 
@@ -200,6 +201,12 @@ Lien IP : cf. spec §Note IP — diverger davantage est justement ce qui protèg
   sans SOL. Décision (après mesure des variantes à la `sim`) : **distribution SOL 1→2, BTC 7→6** (`setup.c`), coûts
   inchangés. Résultat : sans-SOL 27 %→~7 %, SOL reste le plus rare. Docs/pages/tests alignés (test_setup : BTC 6/SOL 2 ;
   test_ui robustifié multi-graines). `spec.md` : table de distribution + note SOL révisées (playtest). 7 suites OK, zéro warning.
+- **2026-07-14** — **Règle A : Position reliée à une Ligne** (retour utilisateur : « à quoi sert une Ligne ? » — elle
+  ne servait à rien). `build.c` : `position_connected` ; `can_build_position` exige désormais une Ligne adjacente du
+  joueur (le placement initial `place_position_free` en est exempt). Messages `CONNECT` génériques (ui.c + web).
+  Tests adaptés (`test_build` : séquence pose libre → routes → Position reliée ; `test_score` : `place_position_free`).
+  `sim` : jeu fluide, score moyen 3,08→2,86 (Positions plus exigeantes, Lignes utiles). `spec.md`/`play.html` alignés.
+  **Règle B (Market Maker = route la plus longue → points) : à faire plus tard.** 7 suites OK, zéro warning.
 - **2026-07-13** — **Placement initial interactif (Q6 tranchée).** Retour utilisateur : les Positions de départ ne
   devraient pas être auto-choisies. Refactor `build.{h,c}` : extraction de `can_place_position_free` /
   `place_position_free` (placement libre, sans coût) ; `can_build_position` et `game_place_initial` réutilisent la
