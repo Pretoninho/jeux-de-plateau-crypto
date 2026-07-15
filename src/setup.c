@@ -3,13 +3,15 @@
 
 #include <assert.h>
 
-/* Distribution des ressources (cf. spec §Plateau) : 18 tuiles ressource. */
+/* Distribution des ressources : 18 tuiles ressource.
+ * Révisée au playtest (2026-07-14) : SOL 1→2, BTC 7→6, pour lever le
+ * déséquilibre lié à la rareté de SOL (voir MEMORY). SOL reste le plus rare. */
 static const Resource RESOURCE_POOL[MAX_TILES - 1] = {
-    RES_BTC, RES_BTC, RES_BTC, RES_BTC, RES_BTC, RES_BTC, RES_BTC,  /* 7 */
+    RES_BTC, RES_BTC, RES_BTC, RES_BTC, RES_BTC, RES_BTC,           /* 6 */
     RES_ALT, RES_ALT, RES_ALT, RES_ALT,                            /* 4 */
     RES_ETH, RES_ETH, RES_ETH,                                     /* 3 */
     RES_STABLE, RES_STABLE, RES_STABLE,                            /* 3 */
-    RES_SOL                                                        /* 1 */
+    RES_SOL, RES_SOL                                              /* 2 */
 };
 
 /* Jetons numériques (cf. spec) : jamais de 7. */
